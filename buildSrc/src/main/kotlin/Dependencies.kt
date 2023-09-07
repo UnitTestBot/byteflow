@@ -1,0 +1,110 @@
+@file:Suppress("PublicApiImplicitType", "MemberVisibilityCanBePrivate", "unused", "ConstPropertyName")
+
+object Versions {
+    const val clikt = "4.2.0"
+    const val dokka = "1.8.20"
+    const val jacodb = "1.2-SNAPSHOT"
+    const val junit = "5.9.2"
+    const val kotlin = "1.9.10"
+    const val kotlin_logging = "5.1.0"
+    const val kotlinx_coroutines = "1.7.3"
+    const val kotlinx_serialization = "1.6.0"
+    const val shadow = "8.1.1"
+    const val slf4j = "2.0.9"
+}
+
+fun dep(group: String, name: String, version: String): String = "$group:$name:$version"
+
+/**
+ * USAGE: in your `build.gradle.kts`:
+ *
+ * ```
+ * dependencies {
+ *     implementation(Libs.<NAME>)
+ * }
+ * ```
+ */
+object Libs {
+    // https://github.com/junit-team/junit5
+    val junit_bom = dep(
+        group = "org.junit",
+        name = "junit-bom",
+        version = Versions.junit
+    )
+    const val junit_jupiter = "org.junit.jupiter:junit-jupiter"
+
+    // https://github.com/MicroUtils/kotlin-logging
+    val kotlin_logging = dep(
+        group = "io.github.oshai",
+        name = "kotlin-logging",
+        version = Versions.kotlin_logging
+    )
+
+    // https://github.com/qos-ch/slf4j
+    val slf4j_simple = dep(
+        group = "org.slf4j",
+        name = "slf4j-simple",
+        version = Versions.slf4j
+    )
+
+    // https://github.com/Kotlin/kotlinx.coroutines
+    val kotlinx_coroutines_core = dep(
+        group = "org.jetbrains.kotlinx",
+        name = "kotlinx-coroutines-core",
+        version = Versions.kotlinx_coroutines
+    )
+
+    // https://github.com/Kotlin/kotlinx.serialization
+    val kotlinx_serialization_json = dep(
+        group = "org.jetbrains.kotlinx",
+        name = "kotlinx-serialization-json",
+        version = Versions.kotlinx_serialization
+    )
+
+    // https://github.com/ajalt/clikt
+    val clikt = dep(
+        group = "com.github.ajalt.clikt",
+        name = "clikt",
+        version = Versions.clikt
+    )
+
+    // https://github.com/UnitTestBot/jacodb
+    val jacodb_api = dep(
+        group = "org.jacodb",
+        name = "jacodb-api",
+        version = Versions.jacodb
+    )
+    val jacodb_core = dep(
+        group = "org.jacodb",
+        name = "jacodb-core",
+        version = Versions.jacodb
+    )
+    val jacodb_analysis = dep(
+        group = "org.jacodb",
+        name = "jacodb-analysis",
+        version = Versions.jacodb
+    )
+}
+
+/**
+ * USAGE: in your `build.gradle.kts`:
+ *
+ * ```
+ * plugins {
+ *     with (Plugins.<NAME>) { id(id) version (version) }
+ * }
+ * ```
+ */
+object Plugins {
+    // https://github.com/Kotlin/dokka
+    object Dokka {
+        const val version = Versions.dokka
+        const val id = "org.jetbrains.dokka"
+    }
+
+    // https://github.com/johnrengelman/shadow
+    object Shadow {
+        const val version = Versions.shadow
+        const val id = "com.github.johnrengelman.shadow"
+    }
+}
