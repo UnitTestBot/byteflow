@@ -112,8 +112,9 @@ class Cli : CliktCommand("taint-analysis") {
         logger.info { "filter start methods" }
         val startJcMethods = startJcClasses
             .flatMap { it.methods }
+            // .flatMap { it.declaredMethods }
             .filter { it.isPublic }
-            .filterNot { it.enclosingClass.name.startsWith("java.lang.") }
+            // .filterNot { it.enclosingClass.name == "java.lang.Object" }
             .distinct()
         echo("startJcMethods: (${startJcMethods.size})")
         for (method in startJcMethods) {
