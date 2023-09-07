@@ -1,0 +1,12 @@
+.dockerignore
+Dockerfile
+
+**/.git
+**/.gitignore
+**/.idea
+**/.gradle
+**/build
+**/target
+
+configs
+**/*.db
