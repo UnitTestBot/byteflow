@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version Versions.kotlin
     kotlin("plugin.serialization") version Versions.kotlin
-    // with(Plugins.Shadow) { id(id) version (version) }
+    with(Plugins.Shadow) { id(id) version (version) }
     application
     `maven-publish`
     // `java-test-fixtures`
@@ -64,11 +64,11 @@ tasks.startScripts {
     applicationName = rootProject.name
 }
 
-// tasks.shadowJar {
-//     archiveBaseName = rootProject.name
-//     archiveClassifier = ""
-//     archiveVersion = ""
-// }
+tasks.shadowJar {
+    archiveBaseName = rootProject.name
+    archiveClassifier = ""
+    archiveVersion = ""
+}
 
 tasks.wrapper {
     gradleVersion = "8.3"
