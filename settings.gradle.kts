@@ -1,3 +1,5 @@
+rootProject.name = "usvm-jacodb-analyzer"
+
 plugins {
     `gradle-enterprise`
 }
