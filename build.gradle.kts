@@ -6,7 +6,6 @@ plugins {
     with(Plugins.Shadow) { id(id) version (version) }
     application
     `maven-publish`
-    // `java-test-fixtures`
 }
 
 group = "org.byteflow"
@@ -31,7 +30,6 @@ dependencies {
     implementation(Libs.jacodb_api)
     implementation(Libs.jacodb_core)
     implementation(Libs.jacodb_analysis)
-    // implementation(testFixtures(Libs.jacodb_core))
     implementation(Libs.clikt)
     implementation(Libs.kotlinx_serialization_json)
     implementation(Libs.kotlinx_coroutines_core)
