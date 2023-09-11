@@ -10,3 +10,4 @@ Dockerfile
 
 configs
 **/*.db
+report.sarif

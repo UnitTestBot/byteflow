@@ -10,14 +10,14 @@ import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.file
+import io.github.detekt.sarif4k.SarifSerializer
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jacodb.analysis.graph.newApplicationGraphForAnalysis
+import org.jacodb.analysis.sarif.sarifReportFromVulnerabilities
 import org.jacodb.api.JcClassOrInterface
 import org.jacodb.api.JcClassProcessingTask
-import org.jacodb.api.ext.methods
 import org.jacodb.impl.features.InMemoryHierarchy
 import org.jacodb.impl.features.Usages
 import org.jacodb.impl.jacodb
@@ -26,10 +26,6 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.TimeSource
 
 private val logger = KotlinLogging.logger {}
-
-private val prettyJson = Json {
-    prettyPrint = true
-}
 
 class Cli : CliktCommand("taint-analysis") {
     init {
@@ -64,15 +60,13 @@ class Cli : CliktCommand("taint-analysis") {
 
     val outputPath: String by option("-o", "--output")
         .help("Path to the resulting file with analysis report")
-        .default("report.json") // TODO: SARIF?
+        .default("report.sarif")
 
     override fun run() {
         val timeStart = TimeSource.Monotonic.markNow()
         logger.info { "start at $timeStart" }
 
-        echo("configFile = $configFile")
         val config = Json.decodeFromString<AnalysisConfig>(configFile.readText())
-        echo("config = ${prettyJson.encodeToString(config)}")
 
         val classpathAsFiles = classpath.split(File.pathSeparatorChar).sorted().map { File(it) }
         val cp = runBlocking {
@@ -111,9 +105,8 @@ class Cli : CliktCommand("taint-analysis") {
         }
         logger.info { "filter start methods" }
         val startJcMethods = startJcClasses
-            .flatMap { it.methods }
-            // .flatMap { it.declaredMethods }
-            .filter { it.isPublic }
+            .flatMap { it.declaredMethods }
+            .filter { !it.isPrivate }
             // .filterNot { it.enclosingClass.name == "java.lang.Object" }
             .distinct()
         echo("startJcMethods: (${startJcMethods.size})")
@@ -127,18 +120,19 @@ class Cli : CliktCommand("taint-analysis") {
         }
 
         logger.info { "Analyzing..." }
-        val results = config.analyses
+        val vulnerabilities = config.analyses
             .mapNotNull { (analysis, options) ->
                 runAnalysis(analysis, options, graph, startJcMethods)
             }
-        logger.info { "analysis done" }
+            .flatten()
+        echo("Analysis done. Found ${vulnerabilities.size} vulnerabilities")
+        // for (vulnerability in vulnerabilities) {
+        //     echo(vulnerability)
+        // }
 
-        echo("Results:")
-        for (vulnerability in results.flatten()) {
-            echo(prettyJson.encodeToString(vulnerability.toDumpable(maxPathsCount = 3)))
-        }
-
-        // TODO: dump results as JSON / SARIF
+        val sarif = sarifReportFromVulnerabilities(vulnerabilities)
+        logger.info { "Writing SARIF to '$outputPath'..." }
+        File(outputPath).writeText(SarifSerializer.toJson(sarif))
 
         echo()
         echo("All done in ${timeStart.elapsedNow()}")
