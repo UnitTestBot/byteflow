@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.byteflow.analyzer
+package org.byteflow
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.context

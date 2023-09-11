@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.byteflow.analyzer.examples;
+package org.byteflow.examples;
 
 import org.jetbrains.annotations.NotNull;
 

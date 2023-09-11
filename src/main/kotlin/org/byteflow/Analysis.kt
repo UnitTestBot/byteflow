@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.byteflow.analyzer
+package org.byteflow
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.serialization.Serializable

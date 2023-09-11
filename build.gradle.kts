@@ -41,7 +41,7 @@ dependencies {
     testImplementation(Libs.junit_jupiter)
 
     // Test dependencies
-    // ...
+    testImplementation(kotlin("test"))
 }
 
 java {
@@ -52,6 +52,13 @@ java {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
     }
 }
 
