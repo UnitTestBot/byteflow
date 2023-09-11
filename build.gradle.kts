@@ -61,7 +61,7 @@ tasks.withType<Test> {
 }
 
 application {
-    mainClass = "org.byteflow.analyzer.CliKt"
+    mainClass = "org.byteflow.CliKt"
     applicationDefaultJvmArgs = listOf("-Dfile.encoding=UTF-8", "-Dsun.stdout.encoding=UTF-8")
 }
 
