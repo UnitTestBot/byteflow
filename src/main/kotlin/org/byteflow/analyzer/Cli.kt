@@ -1,5 +1,3 @@
-@file:Suppress("MemberVisibilityCanBePrivate")
-
 package org.byteflow.analyzer
 
 import com.github.ajalt.clikt.core.CliktCommand
@@ -27,6 +25,7 @@ import kotlin.time.TimeSource
 
 private val logger = KotlinLogging.logger {}
 
+@Suppress("MemberVisibilityCanBePrivate")
 class Cli : CliktCommand("byteflow") {
     init {
         context {
