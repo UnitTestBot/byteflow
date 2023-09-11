@@ -9,7 +9,7 @@ plugins {
     // `java-test-fixtures`
 }
 
-group = "org.usvm"
+group = "org.byteflow"
 version = "0.1.0-SNAPSHOT"
 
 repositories {
@@ -56,7 +56,7 @@ tasks.withType<KotlinCompile> {
 }
 
 application {
-    mainClass = "org.usvm.analyzer.CliKt"
+    mainClass = "org.byteflow.analyzer.CliKt"
     applicationDefaultJvmArgs = listOf("-Dfile.encoding=UTF-8", "-Dsun.stdout.encoding=UTF-8")
 }
 

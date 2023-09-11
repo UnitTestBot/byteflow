@@ -1,8 +1,8 @@
-# usvm-jacodb-analyzer
+# ByteFlow Nexus
 
 ## Run
 
 ```shell
 ./gradlew -q installDist
-./build/install/usvm-jacodb-analyzer/bin/usvm-jacodb-analyzer -c configs/config.json -s org.usvm.analyzer.examples.NpeExamples
+./build/install/byteflow/bin/byteflow -c configs/config.json -s org.byteflow.analyzer.examples.NpeExamples
 ```

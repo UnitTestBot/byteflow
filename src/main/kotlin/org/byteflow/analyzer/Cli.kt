@@ -1,6 +1,6 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package org.usvm.analyzer
+package org.byteflow.analyzer
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.context
@@ -27,7 +27,7 @@ import kotlin.time.TimeSource
 
 private val logger = KotlinLogging.logger {}
 
-class Cli : CliktCommand("taint-analysis") {
+class Cli : CliktCommand("byteflow") {
     init {
         context {
             helpFormatter = {
@@ -125,7 +125,7 @@ class Cli : CliktCommand("taint-analysis") {
                 runAnalysis(analysis, options, graph, startJcMethods)
             }
             .flatten()
-        echo("Analysis done. Found ${vulnerabilities.size} vulnerabilities")
+        logger.info { "Analysis done. Found ${vulnerabilities.size} vulnerabilities" }
         // for (vulnerability in vulnerabilities) {
         //     echo(vulnerability)
         // }

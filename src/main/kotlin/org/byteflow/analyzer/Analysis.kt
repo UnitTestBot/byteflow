@@ -1,4 +1,4 @@
-package org.usvm.analyzer
+package org.byteflow.analyzer
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.serialization.Serializable

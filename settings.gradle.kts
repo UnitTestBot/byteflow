@@ -1,4 +1,4 @@
-rootProject.name = "usvm-jacodb-analyzer"
+rootProject.name = "byteflow"
 
 plugins {
     `gradle-enterprise`

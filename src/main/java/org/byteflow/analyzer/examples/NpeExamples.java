@@ -1,4 +1,4 @@
-package org.usvm.analyzer.examples;
+package org.byteflow.analyzer.examples;
 
 import org.jetbrains.annotations.NotNull;
 
