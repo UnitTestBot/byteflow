@@ -42,7 +42,7 @@ fun runAnalysis(
     methods: List<JcMethod>,
     timeoutMillis: Long = Long.MAX_VALUE,
 ): List<VulnerabilityInstance>? {
-    logger.info { "Launching analysis $analysis" }
+    logger.info { "Launching analysis: '$analysis'" }
     val runner = when (analysis) {
         "NPE" -> {
             newNpeRunnerFactory()
@@ -62,7 +62,7 @@ fun runAnalysis(
         }
     }
     val unitResolverName = options.getOrDefault("UnitResolver", "method")
-    logger.info { "Using '$unitResolverName' unit resolver" }
+    logger.info { "Using unit resolver: '$unitResolverName'" }
     val unitResolver = UnitResolver.getByName(unitResolverName)
     val manager = MainIfdsUnitManager(graph, unitResolver, runner, methods, timeoutMillis)
     return manager.analyze()
