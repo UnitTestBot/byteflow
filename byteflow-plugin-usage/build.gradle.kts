@@ -17,7 +17,7 @@ repositories {
 }
 
 byteflow {
-    configFile = File("../configs/config.json")
+    configFile = layout.projectDirectory.file("configs/config.json")
     startClasses = listOf("org.example.NpeExamples")
     classpath = sourceSets["main"].runtimeClasspath.asPath
 }

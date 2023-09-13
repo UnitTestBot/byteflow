@@ -12,7 +12,7 @@ You can run the ByteFlow analyzer via command-line interface:
 
 ```shell
 ./gradlew -q installDist
-./byteflow-cli/build/install/cli/bin/byteflow -c configs/config.json -s org.byteflow.examples.NpeExamples
+./byteflow-cli/build/install/cli/bin/byteflow -c byteflow-cli/src/test/resources/config.json -s org.byteflow.examples.NpeExamples
 ```
 
 ### Gradle plugin
