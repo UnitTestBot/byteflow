@@ -25,7 +25,7 @@ class ByteFlowPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         // Example 'hello' task
         project.tasks.register("hello") {
-            println("Hello from the GreetingPlugin")
+            println("Hello!")
         }
 
         // 'byteflow {}' extension
