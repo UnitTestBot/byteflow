@@ -66,7 +66,7 @@ class Cli : CliktCommand("byteflow") {
 
     val startClasses: String by option("-s", "--start")
         .help("Comma-separated list of classes from which to start the analysis")
-        // .default("org.usvm.analyzer.examples.NpeExamples")
+        // .default("org.byteflow.examples.NpeExamples")
         .required()
 
     val classpath: String by option("-cp", "--classpath")
