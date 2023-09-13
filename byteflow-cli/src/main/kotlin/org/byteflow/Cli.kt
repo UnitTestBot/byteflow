@@ -23,10 +23,11 @@ import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.file
-import io.github.detekt.sarif4k.SarifSerializer
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToStream
 import org.jacodb.analysis.graph.newApplicationGraphForAnalysis
 import org.jacodb.analysis.sarif.sarifReportFromVulnerabilities
 import org.jacodb.api.JcClassOrInterface
@@ -76,6 +77,7 @@ class Cli : CliktCommand("byteflow") {
         .help("Path to the resulting file with analysis report")
         .default("report.sarif")
 
+    @OptIn(ExperimentalSerializationApi::class)
     override fun run() {
         val timeStart = TimeSource.Monotonic.markNow()
         logger.info { "start at $timeStart" }
@@ -146,7 +148,13 @@ class Cli : CliktCommand("byteflow") {
 
         val sarif = sarifReportFromVulnerabilities(vulnerabilities)
         logger.info { "Writing SARIF to '$outputPath'..." }
-        File(outputPath).writeText(SarifSerializer.toJson(sarif))
+        val json = Json {
+            prettyPrint = true
+            prettyPrintIndent = "  "
+        }
+        File(outputPath).outputStream().use { output ->
+            json.encodeToStream(sarif, output)
+        }
 
         echo()
         echo("All done in ${timeStart.elapsedNow()}")
