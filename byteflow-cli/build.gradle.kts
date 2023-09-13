@@ -1,5 +1,4 @@
 plugins {
-    kotlin("jvm")
     kotlin("plugin.serialization")
     application
     `maven-publish`
