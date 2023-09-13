@@ -4,7 +4,7 @@ plugins {
 }
 
 buildscript {
-    // Repos for plugin deps:
+    // Repositories for plugin dependencies:
     repositories {
         mavenLocal()
         mavenCentral()
