@@ -9,6 +9,7 @@ dependencies {
 
     implementation(Libs.clikt)
     implementation(Libs.kotlinx_serialization_json)
+    implementation(Libs.sarif4k)
 
     implementation(Libs.kotlin_logging)
     implementation(Libs.slf4j_simple)

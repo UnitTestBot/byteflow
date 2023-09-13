@@ -9,6 +9,7 @@ dependencies {
 
     implementation(Libs.kotlinx_coroutines_core)
     implementation(Libs.kotlinx_serialization_json)
+    implementation(Libs.sarif4k)
 }
 
 group = "io.github.UnitTestBot"

@@ -10,6 +10,7 @@ object Versions {
     const val kotlin_logging = "5.1.0"
     const val kotlinx_coroutines = "1.7.3"
     const val kotlinx_serialization = "1.6.0"
+    const val sarif4k = "0.4.0"
     const val shadow = "8.1.1"
     const val slf4j = "2.0.9"
 }
@@ -84,6 +85,13 @@ object Libs {
         group = "org.jacodb",
         name = "jacodb-analysis",
         version = Versions.jacodb
+    )
+
+    // https://github.com/detekt/sarif4k
+    val sarif4k = dep(
+        group = "io.github.detekt.sarif4k",
+        name = "sarif4k",
+        version = Versions.sarif4k
     )
 }
 
