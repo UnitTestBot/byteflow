@@ -15,11 +15,11 @@
  */
 package org.byteflow.gradle
 
-import io.github.detekt.sarif4k.SarifSerializer
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import kotlinx.serialization.json.encodeToStream
 import org.byteflow.runAnalysis
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
@@ -132,9 +132,15 @@ abstract class RunAnalyzerTask : DefaultTask() {
         // }
 
         val sarif = sarifReportFromVulnerabilities(vulnerabilities)
+        val json = Json {
+            prettyPrint = true
+            prettyPrintIndent = "  "
+        }
         val output = File(outputPath.get())
         logger.quiet("Writing SARIF to '$output'...")
-        output.writeText(SarifSerializer.toJson(sarif))
+        output.outputStream().use { stream ->
+            json.encodeToStream(sarif, stream)
+        }
 
         logger.quiet("All done in ${timeStart.elapsedNow()}")
     }
