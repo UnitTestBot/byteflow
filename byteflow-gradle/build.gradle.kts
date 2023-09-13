@@ -1,14 +1,12 @@
 plugins {
+    kotlin("plugin.serialization")
     id(Plugins.PluginPublish.id)
     // id(Plugins.Shadow.id)
 }
 
 dependencies {
-    implementation(project(":cli"))
+    implementation(project(":core"))
 
-    implementation(Libs.jacodb_api)
-    implementation(Libs.jacodb_core)
-    implementation(Libs.jacodb_analysis)
     implementation(Libs.kotlinx_coroutines_core)
     implementation(Libs.kotlinx_serialization_json)
 }

@@ -16,5 +16,6 @@ fun myInclude(name: String) {
     project(":$name").projectDir = file("${rootProject.name}-$name")
 }
 
+myInclude("core")
 myInclude("cli")
 myInclude("gradle")

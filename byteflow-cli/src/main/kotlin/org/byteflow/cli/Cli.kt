@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.byteflow
+package org.byteflow.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.context
@@ -26,8 +26,12 @@ import com.github.ajalt.clikt.parameters.types.file
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToStream
+import org.byteflow.AnalysesOptions
+import org.byteflow.AnalysisType
+import org.byteflow.runAnalysis
 import org.jacodb.analysis.graph.newApplicationGraphForAnalysis
 import org.jacodb.analysis.sarif.sarifReportFromVulnerabilities
 import org.jacodb.api.JcClassOrInterface
@@ -40,6 +44,9 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.TimeSource
 
 private val logger = KotlinLogging.logger {}
+
+@Serializable
+data class AnalysisConfig(val analyses: Map<AnalysisType, AnalysesOptions>)
 
 @Suppress("MemberVisibilityCanBePrivate")
 class Cli : CliktCommand("byteflow") {
@@ -146,18 +153,21 @@ class Cli : CliktCommand("byteflow") {
         //     echo(vulnerability)
         // }
 
-        val sarif = sarifReportFromVulnerabilities(vulnerabilities)
-        logger.info { "Writing SARIF to '$outputPath'..." }
-        val json = Json {
-            prettyPrint = true
-            prettyPrintIndent = "  "
-        }
-        File(outputPath).outputStream().use { output ->
-            json.encodeToStream(sarif, output)
+        if (outputPath != "") {
+            val sarif = sarifReportFromVulnerabilities(vulnerabilities)
+            val json = Json {
+                prettyPrint = true
+                prettyPrintIndent = "  "
+            }
+            logger.info { "Writing SARIF to '$outputPath'..." }
+            File(outputPath).outputStream().use { output ->
+                json.encodeToStream(sarif, output)
+            }
+        } else {
+            logger.info { "Not writing SARIF report. Use non-empty '-o/--output' argument" }
         }
 
-        echo()
-        echo("All done in ${timeStart.elapsedNow()}")
+        logger.info { "All done in ${timeStart.elapsedNow()}" }
     }
 }
 

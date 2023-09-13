@@ -17,8 +17,9 @@ package org.byteflow.gradle
 
 import io.github.detekt.sarif4k.SarifSerializer
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import org.byteflow.AnalysisConfig
+import kotlinx.serialization.json.decodeFromStream
 import org.byteflow.runAnalysis
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
@@ -28,6 +29,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
+import org.jacodb.analysis.AnalysisConfig
 import org.jacodb.analysis.graph.newApplicationGraphForAnalysis
 import org.jacodb.analysis.sarif.sarifReportFromVulnerabilities
 import org.jacodb.api.JcClassOrInterface
@@ -39,6 +41,7 @@ import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.TimeSource
 
+@OptIn(ExperimentalSerializationApi::class)
 abstract class RunAnalyzerTask : DefaultTask() {
     @get:InputFile
     abstract val configFile: RegularFileProperty
@@ -61,11 +64,12 @@ abstract class RunAnalyzerTask : DefaultTask() {
         val timeStart = TimeSource.Monotonic.markNow()
         logger.quiet("start at $timeStart")
 
-        val config = Json.decodeFromString<AnalysisConfig>(configFile.get().asFile.readText())
+        val config = configFile.get().asFile.inputStream().use { input ->
+            Json.decodeFromStream<AnalysisConfig>(input)
+        }
 
         val classpathAsFiles = classpath.get().split(File.pathSeparatorChar).sorted().map { File(it) }
         logger.quiet("classpath = $classpathAsFiles")
-        // val classpathAsFiles = classpath.get()
         val cp = runBlocking {
             logger.quiet("initializing jacodb...")
             val jacodb = jacodb {
@@ -81,7 +85,6 @@ abstract class RunAnalyzerTask : DefaultTask() {
         }
         logger.quiet("cp created")
 
-        // val startClassesAsList = startClasses.split(",")
         val startClassesAsList = startClasses.get()
         logger.quiet("startClasses: (${startClassesAsList.size})")
         for (clazz in startClassesAsList) {

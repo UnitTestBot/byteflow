@@ -16,7 +16,6 @@
 package org.byteflow
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.serialization.Serializable
 import org.jacodb.analysis.engine.MainIfdsUnitManager
 import org.jacodb.analysis.engine.UnitResolver
 import org.jacodb.analysis.engine.VulnerabilityInstance
@@ -31,16 +30,13 @@ private val logger = KotlinLogging.logger {}
 typealias AnalysisType = String
 typealias AnalysesOptions = Map<String, String>
 
-@Serializable
-data class AnalysisConfig(val analyses: Map<AnalysisType, AnalysesOptions>)
-
 fun runAnalysis(
     analysis: AnalysisType,
     options: AnalysesOptions,
     graph: JcApplicationGraph,
     methods: List<JcMethod>,
     timeoutMillis: Long = Long.MAX_VALUE,
-): List<VulnerabilityInstance>? {
+): List<VulnerabilityInstance> {
     logger.info { "Launching analysis: '$analysis'" }
     val runner = when (analysis) {
         "NPE" -> {
@@ -56,8 +52,7 @@ fun runAnalysis(
         }
 
         else -> {
-            logger.error { "Unknown analysis type: '$analysis'" }
-            return null
+            error("Unknown analysis type: '$analysis'")
         }
     }
     val unitResolverName = options.getOrDefault("UnitResolver", "method")
