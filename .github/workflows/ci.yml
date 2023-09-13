@@ -18,6 +18,17 @@ jobs:
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v2
 
+      - name: Checkout specific version of JacoDB
+        uses: actions/checkout@v4
+        with:
+          repository: UnitTestBot/jacodb
+          ref: lipen/sarif4k
+          path: jacodb
+
+      - name: Build JacoDB
+        working-directory: jacodb
+        run: ./gradlew publishToMavenLocal
+
       - name: Build and run tests
         run: ./gradlew build --stacktrace --scan
 
