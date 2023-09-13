@@ -2,6 +2,7 @@ plugins {
     kotlin("plugin.serialization")
     application
     `maven-publish`
+    // id(Plugins.Shadow.id)
 }
 
 dependencies {
@@ -37,3 +38,9 @@ publishing {
         }
     }
 }
+
+// tasks.shadowJar {
+//     archiveBaseName = rootProject.name
+//     archiveClassifier = ""
+//     archiveVersion = ""
+// }
