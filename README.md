@@ -1,5 +1,9 @@
 # ByteFlow Nexus
 
+[![CI](https://github.com/UnitTestBot/byteflow/actions/workflows/ci.yml/badge.svg)](https://github.com/UnitTestBot/byteflow/actions/workflows/ci.yml)
+[![JitPack](https://jitpack.io/v/UnitTestBot/byteflow.svg)](https://jitpack.io/p/UnitTestBot/byteflow)
+![License](https://img.shields.io/github/license/UnitTestBot/byteflow)
+
 ## Run
 
 ### CLI application
