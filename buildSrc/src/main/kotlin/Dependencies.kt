@@ -3,6 +3,7 @@
 object Versions {
     const val clikt = "4.2.0"
     const val dokka = "1.8.20"
+    const val gradle_plugin_publish = "1.2.1"
     const val jacodb = "1.2-SNAPSHOT"
     const val junit = "5.9.2"
     const val kotlin = "1.9.10"
@@ -100,6 +101,12 @@ object Plugins {
     object Dokka {
         const val version = Versions.dokka
         const val id = "org.jetbrains.dokka"
+    }
+
+    // https://plugins.gradle.org/docs/publish-plugin
+    object PluginPublish {
+        const val version = Versions.gradle_plugin_publish
+        const val id = "com.gradle.plugin-publish"
     }
 
     // https://github.com/johnrengelman/shadow

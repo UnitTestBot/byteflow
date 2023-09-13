@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
     application
+    `maven-publish`
 }
 
 dependencies {
@@ -23,4 +24,17 @@ application {
 
 tasks.startScripts {
     applicationName = rootProject.name
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
+    repositories {
+        maven {
+            url = uri(layout.buildDirectory.dir("repository"))
+        }
+    }
 }

@@ -1,14 +1,18 @@
 plugins {
     kotlin("jvm") version Versions.kotlin
     kotlin("plugin.serialization") version Versions.kotlin apply false
-    with(Plugins.Shadow) { id(id) version (version) }
+    with(Plugins.PluginPublish) { id(id) version (version) } apply false
+    with(Plugins.Shadow) { id(id) version (version) } apply false
 }
 
-allprojects {
-    group = "org.byteflow"
-    version = "0.1.0-SNAPSHOT"
+group = "org.byteflow"
+version = "0.1.0-SNAPSHOT"
 
-    apply(plugin = "maven-publish")
+subprojects {
+    group = rootProject.group
+    version = rootProject.version
+
+    apply(plugin = "kotlin")
 
     repositories {
         mavenLocal {
@@ -19,12 +23,15 @@ allprojects {
         mavenCentral()
         maven("https://jitpack.io")
     }
-}
 
-tasks.shadowJar {
-    archiveBaseName = rootProject.name
-    archiveClassifier = ""
-    archiveVersion = ""
+    dependencies {
+        implementation(platform(kotlin("bom")))
+        implementation(kotlin("stdlib-jdk8"))
+
+        testImplementation(platform(Libs.junit_bom))
+        testImplementation(Libs.junit_jupiter)
+        testImplementation(kotlin("test"))
+    }
 }
 
 tasks.wrapper {

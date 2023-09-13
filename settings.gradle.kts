@@ -17,3 +17,4 @@ fun myInclude(name: String) {
 }
 
 myInclude("cli")
+myInclude("gradle")
