@@ -20,10 +20,12 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.SourceSet
 import org.gradle.testfixtures.ProjectBuilder
 
+internal const val BYTEFLOW_GRADLE_PLUGIN = "io.github.UnitTestBot.byteflow"
+
 internal fun buildProject(): Project {
     return ProjectBuilder.builder().build().also {
         it.pluginManager.apply("java")
-        it.pluginManager.apply("org.utbot.gradle.plugin")
+        it.pluginManager.apply(BYTEFLOW_GRADLE_PLUGIN)
     }
 }
 
