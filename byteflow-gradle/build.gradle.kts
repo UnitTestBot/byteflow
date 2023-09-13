@@ -38,9 +38,7 @@ publishing {
 }
 
 // tasks.shadowJar {
-//     // archiveBaseName = rootProject.name
 //     archiveClassifier = ""
-//     // archiveVersion = ""
 // }
 
 tasks.register("stuff") {
