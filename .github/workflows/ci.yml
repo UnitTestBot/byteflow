@@ -37,3 +37,17 @@ jobs:
         if: always()
         with:
           files: "**/build/test-results/**/*.xml"
+
+      # Here, the main build is complete, and below is the sample usage of the analyzer.
+
+      - name: Publish to local Maven repository
+        run: ./gradlew :core:publishToMavenLocal :gradle:publish
+
+      - name: Run analysis on sample project
+        working-directory: byteflow-plugin-usage
+        run: ./gradlew runAnalyzer
+
+      - name: Upload sarif
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: byteflow-plugin-usage/report.sarif
