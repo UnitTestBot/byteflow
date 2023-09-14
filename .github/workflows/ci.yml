@@ -47,7 +47,13 @@ jobs:
         working-directory: byteflow-plugin-usage
         run: ./gradlew runAnalyzer
 
-      - name: Upload sarif
+      - name: Upload SARIF report as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sarif-report
+          path: byteflow-plugin-usage/report.sarif
+
+      - name: Upload SARIF report
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: byteflow-plugin-usage/report.sarif
