@@ -132,7 +132,16 @@ abstract class RunAnalyzerTask : DefaultTask() {
         //     echo(vulnerability)
         // }
 
-        val sarif = sarifReportFromVulnerabilities(vulnerabilities)
+        val sarif = sarifReportFromVulnerabilities(vulnerabilities) { inst ->
+            val registeredLocation = inst.location.method.declaration.location
+            val classFileBaseName = inst.location.method.enclosingClass.name.replace('.', '/')
+            if (registeredLocation.path.contains("build/classes/java/main")) {
+                val src = registeredLocation.path.replace("build/classes/java/main", "src/main/java")
+                File(src).resolve(classFileBaseName.substringBefore('$')).path + ".java"
+            } else {
+                File(registeredLocation.path).resolve(classFileBaseName).path + ".class"
+            }
+        }
         val json = Json {
             prettyPrint = true
             prettyPrintIndent = "  "
