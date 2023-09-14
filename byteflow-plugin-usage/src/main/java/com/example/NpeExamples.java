@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.example;
+package com.example;
 
 import org.jetbrains.annotations.NotNull;
 
