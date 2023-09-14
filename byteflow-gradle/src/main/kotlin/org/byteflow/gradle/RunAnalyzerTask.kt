@@ -137,7 +137,7 @@ abstract class RunAnalyzerTask : DefaultTask() {
             val classFileBaseName = inst.location.method.enclosingClass.name.replace('.', '/')
             if (registeredLocation.path.contains("build/classes/java/main")) {
                 val src = registeredLocation.path.replace("build/classes/java/main", "src/main/java")
-                File(src).resolve(classFileBaseName.substringBefore('$')).path + ".java"
+                "file://" + File(src).resolve(classFileBaseName.substringBefore('$')).path + ".java"
             } else {
                 File(registeredLocation.path).resolve(classFileBaseName).path + ".class"
             }
