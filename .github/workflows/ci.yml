@@ -27,7 +27,7 @@ jobs:
 
       - name: Build JacoDB
         working-directory: jacodb
-        run: ./gradlew publishToMavenLocal
+        run: ./gradlew :jacodb-api:publishToMavenLocal :jacodb-core:publishToMavenLocal :jacodb-analysis:publishToMavenLocal
 
       - name: Build and run tests
         run: ./gradlew build --stacktrace --scan
