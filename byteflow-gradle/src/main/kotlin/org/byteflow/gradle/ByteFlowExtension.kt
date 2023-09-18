@@ -25,7 +25,7 @@ import org.gradle.api.provider.Property
  *
  * ```
  * byteflow {
- *     // configFile = File("configs/config.json")
+ *     // configFile = layout.projectDirectory.file("configs/config.json")
  *     // dbLocation = "index.db"
  *     startClasses = listOf("org.byteflow.examples.NpeExamples")
  *     classpath = System.getProperty("java.class.path")
