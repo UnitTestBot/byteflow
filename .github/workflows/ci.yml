@@ -64,7 +64,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: UnitTestBot/juliet-java-test-suite
-          path: examples/byteflow-plugin-usage/juliet-java-test-suite
+          path: examples/byteflow-juliet/juliet-java-test-suite
 
       # Juliet (CWE476 - NPE)
 
