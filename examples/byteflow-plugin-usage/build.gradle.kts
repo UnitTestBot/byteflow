@@ -20,6 +20,7 @@ byteflow {
     configFile = layout.projectDirectory.file("configs/config.json")
     startClasses = listOf("com.example.NpeExamples")
     classpath = sourceSets["main"].runtimeClasspath.asPath
+    // dbLocation = "index.db"
 }
 
 tasks.runAnalyzer {

@@ -28,6 +28,6 @@ You can run the ByteFlow analyzer via Gradle plugin.
 - Next, run the analyzer from the example project:
 
 ```shell
-cd byteflow-plugin-usage
+cd examples/byteflow-plugin-usage
 ./gradlew runAnalyzer
 ```

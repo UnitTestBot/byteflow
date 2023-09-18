@@ -44,16 +44,16 @@ jobs:
         run: ./gradlew :core:publishToMavenLocal :gradle:publish
 
       - name: Run analysis on sample project
-        working-directory: byteflow-plugin-usage
+        working-directory: examples/byteflow-plugin-usage
         run: ./gradlew runAnalyzer
 
       - name: Upload SARIF report as artifact
         uses: actions/upload-artifact@v3
         with:
           name: sarif-report
-          path: byteflow-plugin-usage/report.sarif
+          path: examples/byteflow-plugin-usage/report.sarif
 
       - name: Upload SARIF report
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: byteflow-plugin-usage/report.sarif
+          sarif_file: examples/byteflow-plugin-usage/report.sarif

@@ -1,7 +1,7 @@
 pluginManagement {
     repositories {
         maven {
-            url = uri("../byteflow-gradle/build/repository")
+            url = uri("../../byteflow-gradle/build/repository")
         }
         gradlePluginPortal()
     }
