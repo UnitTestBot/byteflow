@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm") version Versions.kotlin
     kotlin("plugin.serialization") version Versions.kotlin apply false
@@ -26,11 +28,22 @@ subprojects {
 
     dependencies {
         implementation(platform(kotlin("bom")))
-        implementation(kotlin("stdlib-jdk8"))
 
         testImplementation(platform(Libs.junit_bom))
         testImplementation(Libs.junit_jupiter)
         testImplementation(kotlin("test"))
+    }
+
+    java {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+
+        withSourcesJar()
+    }
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
     }
 }
 
