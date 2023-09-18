@@ -123,7 +123,7 @@ fun julietResolver(cweNum: Int): (JcInst) -> String = { inst ->
     }
 }
 
-tasks.register<RunAnalyzerExtendedTask>("analyzeJulietNpe476") {
+tasks.register<RunAnalyzerExtendedTask>("analyzeJulietCwe476") {
     println("Registering '${this.name}' task")
     dependsOn(tasks.compileJava)
 
@@ -150,12 +150,12 @@ tasks.register<RunAnalyzerExtendedTask>("analyzeJulietNpe476") {
                 .toList()
         }
     }
-    outputPath = "report-npe476.sarif"
+    outputPath = "report-cwe476.sarif"
     resolver = julietResolver(476)
 }
 
 
-tasks.register<RunAnalyzerExtendedTask>("analyzeJulietNpe690") {
+tasks.register<RunAnalyzerExtendedTask>("analyzeJulietCwe690") {
     println("Registering '${this.name}' task")
     dependsOn(tasks.compileJava)
 
@@ -180,12 +180,12 @@ tasks.register<RunAnalyzerExtendedTask>("analyzeJulietNpe690") {
                 .toList()
         }
     }
-    outputPath = "report-npe690.sarif"
+    outputPath = "report-cwe690.sarif"
     resolver = julietResolver(690)
 }
 
 
-tasks.register<RunAnalyzerExtendedTask>("analyzeJulietUnused") {
+tasks.register<RunAnalyzerExtendedTask>("analyzeJulietCwe563") {
     println("Registering '${this.name}' task")
     dependsOn(tasks.compileJava)
 
@@ -225,11 +225,11 @@ tasks.register<RunAnalyzerExtendedTask>("analyzeJulietUnused") {
                 .toList()
         }
     }
-    outputPath = "report-unused.sarif"
+    outputPath = "report-cwe563.sarif"
     resolver = julietResolver(563)
 }
 
-tasks.register<RunAnalyzerExtendedTask>("analyzeJulietSql") {
+tasks.register<RunAnalyzerExtendedTask>("analyzeJulietCwe89") {
     println("Registering '${this.name}' task")
     dependsOn(tasks.compileJava)
 
@@ -257,7 +257,7 @@ tasks.register<RunAnalyzerExtendedTask>("analyzeJulietSql") {
                 .toList()
         }
     }
-    outputPath = "report-sql.sarif"
+    outputPath = "report-cwe89.sarif"
     resolver = julietResolver(89)
 }
 
