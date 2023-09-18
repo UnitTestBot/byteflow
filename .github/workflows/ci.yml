@@ -60,6 +60,12 @@ jobs:
         with:
           sarif_file: examples/byteflow-plugin-usage/report.sarif
 
+      - name: Checkout Juliet test suite
+        uses: actions/checkout@v4
+        with:
+          repository: UnitTestBot/juliet-java-test-suite
+          path: examples/byteflow-plugin-usage/juliet-java-test-suite
+
       # Juliet (CWE476 - NPE)
 
       - name: Run analysis on sample project (Juliet CWE476)
