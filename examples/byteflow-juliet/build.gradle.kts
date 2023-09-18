@@ -77,7 +77,7 @@ private val commonJulietBans = listOf(
     "_10", "_14",
 )
 
-private fun julietClasses(
+fun julietClasses(
     cp: JcClasspath,
 ): Sequence<JcClassOrInterface> = runBlocking {
     val hierarchyExt = cp.hierarchyExt()
@@ -85,7 +85,7 @@ private fun julietClasses(
     hierarchyExt.findSubClasses(baseClass, false)
 }
 
-private fun julietMethods(classes: () -> List<JcClassOrInterface>): List<JcMethod> {
+fun julietMethods(classes: () -> List<JcClassOrInterface>): List<JcMethod> {
     logger.quiet("Searching for classes...")
     val startClasses = classes()
 
@@ -112,7 +112,7 @@ private fun julietMethods(classes: () -> List<JcClassOrInterface>): List<JcMetho
     return startMethods
 }
 
-private fun julietResolver(cweNum: Int): (JcInst) -> String = { inst ->
+fun julietResolver(cweNum: Int): (JcInst) -> String = { inst ->
     val registeredLocation = inst.location.method.declaration.location
     val classFileBaseName = inst.location.method.enclosingClass.name.replace('.', '/')
     if (registeredLocation.path.contains("build/classes/java/main")) {
