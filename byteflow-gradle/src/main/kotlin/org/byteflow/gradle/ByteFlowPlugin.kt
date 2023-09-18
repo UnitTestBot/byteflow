@@ -18,38 +18,38 @@ package org.byteflow.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.register
 
 class ByteFlowPlugin : Plugin<Project> {
-    internal val byteflowExtensionName = "byteflow"
-    internal val runAnalyzerTaskName = "runAnalyzer"
-
     override fun apply(project: Project) {
+        project.logger.quiet("Applying ByteFlow plugin")
+
         // Example 'hello' task
         project.tasks.register("hello") {
-            println("Hello!")
+            logger.quiet("Registering '$name' task")
+            doLast {
+                println("Hello!")
+            }
         }
 
         // 'byteflow {}' extension
-        val extension = project.extensions.create(
-            byteflowExtensionName,
-            ByteFlowExtension::class.java
-        ).also {
+        val extension = project.extensions.create<ByteFlowExtension>(ByteFlowExtension.NAME)
+        extension.apply {
             // Defaults:
-            it.configFile.convention(project.layout.projectDirectory.file("configs/config.json"))
-            it.outputPath.convention("report.sarif")
+            configFile.convention(project.layout.projectDirectory.file("configs/config.json"))
+            outputPath.convention("report.sarif")
         }
 
         // 'runAnalyzer' task
-        project.tasks.register(
-            runAnalyzerTaskName,
-            RunAnalyzerTask::class.java,
-        ) {
+        project.tasks.register<RunAnalyzerTask>(RunAnalyzerTask.NAME) {
+            logger.quiet("Registering '$name' task")
             // Mapping:
-            it.configFile.convention(extension.configFile)
-            it.dbLocation.convention(extension.dbLocation)
-            it.startClasses.convention(extension.startClasses)
-            it.classpath.convention(extension.classpath)
-            it.outputPath.convention(extension.outputPath)
+            configFile.convention(extension.configFile)
+            dbLocation.convention(extension.dbLocation)
+            startClasses.convention(extension.startClasses)
+            classpath.convention(extension.classpath)
+            outputPath.convention(extension.outputPath)
         }
     }
 }

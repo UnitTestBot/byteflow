@@ -1,4 +1,5 @@
 plugins {
+    `kotlin-dsl`
     kotlin("plugin.serialization")
     id(Plugins.PluginPublish.id)
     // id(Plugins.Shadow.id)

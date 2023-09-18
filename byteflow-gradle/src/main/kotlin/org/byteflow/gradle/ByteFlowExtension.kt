@@ -38,4 +38,8 @@ interface ByteFlowExtension {
     val startClasses: ListProperty<String>
     val classpath: Property<String>
     val outputPath: Property<String>
+
+    companion object {
+        const val NAME: String = "byteflow"
+    }
 }
