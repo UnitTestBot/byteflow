@@ -27,7 +27,9 @@ jobs:
         with:
           files: "**/build/test-results/**/*.xml"
 
-      # Here, the main build is complete, and below is the sample usage of the analyzer.
+      #---------------------------------------------
+      # Here, the main build is complete, and below
+      # is the sample usage of the analyzer.
 
       - name: Publish to local Maven repository
         run: ./gradlew :core:publishToMavenLocal :gradle:publish
@@ -49,12 +51,6 @@ jobs:
         with:
           sarif_file: examples/byteflow-plugin-usage/report.sarif
           category: example
-
-      - name: Checkout Juliet test suite
-        uses: actions/checkout@v4
-        with:
-          repository: UnitTestBot/juliet-java-test-suite
-          path: examples/byteflow-juliet/juliet-java-test-suite
 
       # Juliet (CWE476 - NPE)
 

@@ -1,0 +1,3 @@
+[submodule "examples/byteflow-juliet/juliet-java-test-suite"]
+	path = examples/byteflow-juliet/juliet-java-test-suite
+	url = https://github.com/UnitTestBot/juliet-java-test-suite
