@@ -1,14 +1,15 @@
 plugins {
     kotlin("jvm") version "1.9.10"
     id("io.github.UnitTestBot.byteflow") version "0.1.0-SNAPSHOT"
+    // id("byteflow-gradle") version "..."
 }
 
 buildscript {
     // Repositories for plugin dependencies:
     repositories {
-        mavenLocal()
         mavenCentral()
         maven("https://jitpack.io")
+        mavenLocal()
     }
 }
 

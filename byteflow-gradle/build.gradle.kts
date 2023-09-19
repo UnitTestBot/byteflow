@@ -13,7 +13,7 @@ dependencies {
     implementation(Libs.sarif4k)
 }
 
-group = "io.github.UnitTestBot"
+group = "com.github.UnitTestBot.byteflow"
 version = "0.1.0-SNAPSHOT"
 
 gradlePlugin {
