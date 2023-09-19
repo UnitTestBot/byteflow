@@ -17,13 +17,9 @@ subprojects {
     apply(plugin = "kotlin")
 
     repositories {
-        mavenLocal {
-            content {
-                includeGroup("org.jacodb")
-            }
-        }
         mavenCentral()
         maven("https://jitpack.io")
+        mavenLocal()
     }
 
     dependencies {
