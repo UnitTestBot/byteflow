@@ -19,7 +19,14 @@ repositories {
 
 byteflow {
     configFile = layout.projectDirectory.file("configs/config.json")
-    startClasses = listOf("com.example.NpeExamples", "com.example.SqlInjectionSample")
+    // startClasses = listOf("com.example.NpeExamples")
+    // startClasses = listOf("com.example.SqlInjectionSample")
+    // startClasses = listOf("com.example.SqlInjectionSample2")
+    startClasses = listOf(
+        "com.example.NpeExamples",
+        "com.example.SqlInjectionSample",
+        "com.example.SqlInjectionSample2",
+    )
     classpath = sourceSets["main"].runtimeClasspath.asPath
     dbLocation = "index.db"
 }
