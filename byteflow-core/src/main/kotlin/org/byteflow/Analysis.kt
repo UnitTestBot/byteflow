@@ -17,6 +17,7 @@
 package org.byteflow
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.jacodb.analysis.AnalysisConfig
 import org.jacodb.analysis.engine.MainIfdsUnitManager
 import org.jacodb.analysis.engine.UnitResolver
 import org.jacodb.analysis.engine.VulnerabilityInstance
@@ -30,6 +31,10 @@ private val logger = KotlinLogging.logger {}
 
 typealias AnalysisType = String
 typealias AnalysesOptions = Map<String, String>
+
+fun analysisConfig(vararg pairs: Pair<AnalysisType, AnalysesOptions>): AnalysisConfig {
+    return AnalysisConfig(pairs.toMap())
+}
 
 fun runAnalysis(
     analysis: AnalysisType,
