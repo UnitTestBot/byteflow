@@ -64,6 +64,10 @@ abstract class RunAnalyzerTask : DefaultTask() {
     @get:Input
     abstract val outputPath: Property<String>
 
+    @get:Optional
+    @get:Input
+    abstract val useUsvmAnalysis: Property<Boolean>
+
     @TaskAction
     fun analyze() {
         val timeStart = TimeSource.Monotonic.markNow()
@@ -128,9 +132,10 @@ abstract class RunAnalyzerTask : DefaultTask() {
         }
 
         logger.quiet("Analyzing...")
+        val useUsvm = useUsvmAnalysis.orNull ?: false
         val vulnerabilities = config.analyses
             .mapNotNull { (analysis, options) ->
-                runAnalysis(analysis, options, graph, startJcMethods)
+                runAnalysis(analysis, options, graph, startJcMethods, useUsvmAnalysis = useUsvm)
             }
             .flatten()
         logger.quiet("Analysis done. Found ${vulnerabilities.size} vulnerabilities")
@@ -189,6 +194,10 @@ abstract class RunAnalyzerExtendedTask : DefaultTask() {
     @get:Input
     abstract val resolver: Property<(JcInst) -> String>
 
+    @get:Optional
+    @get:Input
+    abstract val useUsvmAnalysis: Property<Boolean>
+
     @TaskAction
     fun analyze() {
         val timeStart = TimeSource.Monotonic.markNow()
@@ -223,10 +232,11 @@ abstract class RunAnalyzerExtendedTask : DefaultTask() {
         logger.quiet("Application graph created")
 
         logger.quiet("Analyzing...")
+        val useUsvm = useUsvmAnalysis.orNull ?: false
         val vulnerabilities = config.analyses
             .flatMap { (analysis, options) ->
                 logger.quiet("running '$analysis' analysis...")
-                runAnalysis(analysis, options, graph, methods)
+                runAnalysis(analysis, options, graph, methods, useUsvmAnalysis = useUsvm)
             }
         logger.quiet("Analysis done. Found ${vulnerabilities.size} vulnerabilities")
         // for (v in vulnerabilities) {

@@ -87,12 +87,29 @@ object Libs {
         name = "jacodb-analysis",
         version = Versions.jacodb
     )
+    val jacodb_approximations = dep(
+        group = jacodb,
+        name = "jacodb-approximations",
+        version = Versions.jacodb
+    )
 
     // https://github.com/detekt/sarif4k
     val sarif4k = dep(
         group = "io.github.detekt.sarif4k",
         name = "sarif4k",
         version = Versions.sarif4k
+    )
+
+    val ksmt_core = dep(
+        group ="io.ksmt",
+        name = "ksmt-core",
+        version = "0.5.7"
+    )
+
+    val ksmt_z3 = dep(
+        group ="io.ksmt",
+        name = "ksmt-z3",
+        version = "0.5.7"
     )
 }
 

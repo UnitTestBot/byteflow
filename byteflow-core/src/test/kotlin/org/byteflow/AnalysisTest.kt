@@ -16,12 +16,61 @@
 
 package org.byteflow
 
+import kotlinx.coroutines.runBlocking
 import org.byteflow.examples.NpeExamples
+import org.byteflow.examples.SqlInjectionSample
+import org.byteflow.examples.SqlInjectionSample2
+import org.jacodb.analysis.graph.newApplicationGraphForAnalysis
+import org.jacodb.api.ext.findClass
+import org.jacodb.approximation.Approximations
+import org.jacodb.impl.features.InMemoryHierarchy
+import org.jacodb.impl.features.Usages
+import org.jacodb.impl.jacodb
+import java.io.File
 import kotlin.test.Test
 
 class AnalysisTest {
     @Test
     fun `test basic analysis of NpeExamples`() {
-        // TODO: runAnalysis()
+        val vulnerabilities = runAnalysis<NpeExamples>("NPE", useUsvm = false)
+        println(vulnerabilities.size)
+    }
+
+    @Test
+    fun `test sql injection FP`() {
+        val vulnerabilities = runAnalysis<SqlInjectionSample>("SQL", useUsvm = true)
+        println(vulnerabilities.size)
+    }
+
+    @Test
+    fun `test sql injection TP`() {
+        val vulnerabilities = runAnalysis<SqlInjectionSample2>("SQL", useUsvm = true)
+        println(vulnerabilities.size)
+    }
+
+    private inline fun <reified T> runAnalysis(analysis: AnalysisType, useUsvm: Boolean) = runBlocking {
+        val classpath = System.getProperty("java.class.path")
+        val classpathAsFiles = classpath.split(File.pathSeparatorChar).map { File(it) }
+
+        val db = jacodb {
+            useProcessJavaRuntime()
+            installFeatures(InMemoryHierarchy, Usages, Approximations)
+        }
+
+        val approximationsCp = resolveApproximationsClassPath()
+        val cp = db.classpath(classpathAsFiles + approximationsCp, listOf(Approximations))
+
+        val clazz = cp.findClass<T>()
+
+        val startJcMethods = listOf(clazz)
+            .flatMap { it.declaredMethods }
+            .filter { !it.isPrivate }
+            .distinct()
+
+        val graph = runBlocking {
+            cp.newApplicationGraphForAnalysis()
+        }
+
+        runAnalysis(analysis, mapOf("UnitResolver" to "singleton"), graph, startJcMethods, useUsvmAnalysis = useUsvm)
     }
 }

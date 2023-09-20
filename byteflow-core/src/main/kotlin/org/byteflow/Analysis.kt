@@ -25,6 +25,7 @@ import org.jacodb.analysis.library.newNpeRunnerFactory
 import org.jacodb.analysis.library.newSqlInjectionRunnerFactory
 import org.jacodb.api.JcMethod
 import org.jacodb.api.analysis.JcApplicationGraph
+import java.io.File
 
 private val logger = KotlinLogging.logger {}
 
@@ -37,6 +38,7 @@ fun runAnalysis(
     graph: JcApplicationGraph,
     methods: List<JcMethod>,
     timeoutMillis: Long = Long.MAX_VALUE,
+    useUsvmAnalysis: Boolean = false
 ): List<VulnerabilityInstance> {
     logger.info { "Launching analysis: '$analysis'" }
     val runner = when (analysis) {
@@ -60,5 +62,27 @@ fun runAnalysis(
     logger.info { "Using unit resolver: '$unitResolverName'" }
     val unitResolver = UnitResolver.getByName(unitResolverName)
     val manager = MainIfdsUnitManager(graph, unitResolver, runner, methods, timeoutMillis)
-    return manager.analyze()
+
+    val vulnerabilities = manager.analyze()
+    if (!useUsvmAnalysis) {
+        return vulnerabilities
+    }
+
+    return analyzeVulnerabilitiesWithUsvm(analysis, options, graph, methods, timeoutMillis, vulnerabilities)
+}
+
+fun resolveApproximationsClassPath() = listOf(
+    JarUnpacker.unpackFromResources("approximations/api.jar"),
+    JarUnpacker.unpackFromResources("approximations/approximations.jar")
+)
+
+private object JarUnpacker {
+    fun unpackFromResources(name: String): File {
+        val resource = this::class.java.classLoader.getResourceAsStream(name)
+        val unpacked = File(name).also {
+            it.parentFile.mkdirs()
+        }
+        resource.use { inp -> unpacked.outputStream().use { inp.copyTo(it) } }
+        return unpacked
+    }
 }
