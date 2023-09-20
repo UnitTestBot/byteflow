@@ -1,13 +1,6 @@
-import kotlinx.coroutines.runBlocking
-import org.byteflow.AnalysesOptions
-import org.byteflow.AnalysisType
-import org.byteflow.gradle.RunAnalyzerExtendedTask
-import org.jacodb.analysis.AnalysisConfig
-import org.jacodb.api.JcClassOrInterface
-import org.jacodb.api.JcClassProcessingTask
-import org.jacodb.api.JcClasspath
-import org.jacodb.api.JcMethod
-import java.util.concurrent.ConcurrentHashMap
+import org.byteflow.gradle.RunAnalyzerTask
+import org.byteflow.gradle.analysisConfig
+import org.byteflow.gradle.getMethodsForClasses
 
 plugins {
     kotlin("jvm") version "1.9.10"
@@ -44,53 +37,10 @@ tasks.runAnalyzer {
 }
 
 // ------------------------------------------------------------------------------------------------
-// Utilities for specific analysis tasks.
-//
-
-fun getMethods(
-    cp: JcClasspath,
-    startClasses: List<String>,
-): List<JcMethod> {
-    logger.quiet("Searching classes...")
-    val startJcClasses = ConcurrentHashMap.newKeySet<JcClassOrInterface>()
-    runBlocking {
-        cp.execute(object : JcClassProcessingTask {
-            override fun process(clazz: JcClassOrInterface) {
-                if (startClasses.any { clazz.name.startsWith(it) }) {
-                    startJcClasses.add(clazz)
-                }
-            }
-        })
-    }
-
-    logger.quiet("startJcClasses: (${startJcClasses.size})")
-    for (clazz in startJcClasses) {
-        logger.quiet("  - $clazz")
-    }
-
-    logger.quiet("Filtering methods...")
-    val startJcMethods = startJcClasses
-        .flatMap { it.declaredMethods }
-        .filter { !it.isPrivate }
-        .distinct()
-
-    logger.quiet("startJcMethods: (${startJcMethods.size})")
-    for (method in startJcMethods) {
-        logger.quiet("  - $method")
-    }
-
-    return startJcMethods
-}
-
-fun analysisConfig(vararg pairs: Pair<AnalysisType, AnalysesOptions>): AnalysisConfig {
-    return AnalysisConfig(pairs.toMap())
-}
-
-// ------------------------------------------------------------------------------------------------
 // Specific analysis tasks.
 //
 
-tasks.register<RunAnalyzerExtendedTask>("analyzeNpeExamples") {
+tasks.register<RunAnalyzerTask>("analyzeNpeExamples") {
     dependsOn(tasks.compileJava)
     config = analysisConfig(
         "NPE" to mapOf(
@@ -99,11 +49,13 @@ tasks.register<RunAnalyzerExtendedTask>("analyzeNpeExamples") {
     )
     dbLocation = "index.db"
     classpath = sourceSets["main"].runtimeClasspath.asPath
-    methods = { cp -> getMethods(cp, startClasses = listOf("com.example.NpeExamples")) }
+    methodsForCp = { cp ->
+        getMethodsForClasses(cp, startClasses = listOf("com.example.NpeExamples"))
+    }
     outputPath = "report-npe.sarif"
 }
 
-tasks.register<RunAnalyzerExtendedTask>("analyzeSqlInjectionSample1") {
+tasks.register<RunAnalyzerTask>("analyzeSqlInjectionSample1") {
     dependsOn(tasks.compileJava)
     config = analysisConfig(
         "SQL" to mapOf(
@@ -112,11 +64,13 @@ tasks.register<RunAnalyzerExtendedTask>("analyzeSqlInjectionSample1") {
     )
     dbLocation = "index.db"
     classpath = sourceSets["main"].runtimeClasspath.asPath
-    methods = { cp -> getMethods(cp, startClasses = listOf("com.example.SqlInjectionSample1")) }
+    methodsForCp = { cp ->
+        getMethodsForClasses(cp, startClasses = listOf("com.example.SqlInjectionSample1"))
+    }
     outputPath = "report-sql1.sarif"
 }
 
-tasks.register<RunAnalyzerExtendedTask>("analyzeSqlInjectionSample2") {
+tasks.register<RunAnalyzerTask>("analyzeSqlInjectionSample2") {
     dependsOn(tasks.compileJava)
     config = analysisConfig(
         "SQL" to mapOf(
@@ -125,7 +79,9 @@ tasks.register<RunAnalyzerExtendedTask>("analyzeSqlInjectionSample2") {
     )
     dbLocation = "index.db"
     classpath = sourceSets["main"].runtimeClasspath.asPath
-    methods = { cp -> getMethods(cp, startClasses = listOf("com.example.SqlInjectionSample2")) }
+    methodsForCp = { cp ->
+        getMethodsForClasses(cp, startClasses = listOf("com.example.SqlInjectionSample2"))
+    }
     outputPath = "report-sql2.sarif"
 }
 

@@ -45,9 +45,18 @@ class ByteFlowPlugin : Plugin<Project> {
         project.tasks.register<RunAnalyzerTask>(RunAnalyzerTask.NAME) {
             logger.quiet("Registering '$name' task")
             // Mapping:
-            configFile.convention(extension.configFile)
+            config.convention(project.provider {
+                if (extension.config.isPresent) {
+                    // TODO: throw GradleException if 'configFile' is present.
+                    extension.config.get()
+                } else {
+                    analysisConfigFromFile(extension.configFile.get().asFile.path)
+                }
+            })
             dbLocation.convention(extension.dbLocation)
-            startClasses.convention(extension.startClasses)
+            methodsForCp.convention { cp ->
+                project.getMethodsForClasses(cp, extension.startClasses.get())
+            }
             classpath.convention(extension.classpath)
             outputPath.convention(extension.outputPath)
         }

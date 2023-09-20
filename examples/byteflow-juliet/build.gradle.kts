@@ -1,7 +1,7 @@
 @file:OptIn(ExperimentalTime::class)
 
 import kotlinx.coroutines.runBlocking
-import org.byteflow.gradle.RunAnalyzerExtendedTask
+import org.byteflow.gradle.RunAnalyzerTask
 import org.jacodb.analysis.AnalysisConfig
 import org.jacodb.api.JcClassOrInterface
 import org.jacodb.api.JcClasspath
@@ -116,14 +116,17 @@ fun julietResolver(cweNum: Int): (JcInst) -> String = { inst ->
     val registeredLocation = inst.location.method.declaration.location
     val classFileBaseName = inst.location.method.enclosingClass.name.replace('.', '/')
     if (registeredLocation.path.contains("build/classes/java/main")) {
-        val src = registeredLocation.path.replace("build/classes/java/main", "juliet-java-test-suite/juliet-cwe${cweNum}/src/main/java")
+        val src = registeredLocation.path.replace(
+            "build/classes/java/main",
+            "juliet-java-test-suite/juliet-cwe${cweNum}/src/main/java"
+        )
         "file://" + File(src).resolve(classFileBaseName.substringBefore('$')).path + ".java"
     } else {
         File(registeredLocation.path).resolve(classFileBaseName).path + ".class"
     }
 }
 
-tasks.register<RunAnalyzerExtendedTask>("analyzeJulietCwe476") {
+tasks.register<RunAnalyzerTask>("analyzeJulietCwe476") {
     println("Registering '${this.name}' task")
     dependsOn(tasks.compileJava)
 
@@ -138,7 +141,7 @@ tasks.register<RunAnalyzerExtendedTask>("analyzeJulietCwe476") {
     )
     dbLocation = "index.db"
     classpath = sourceSets["main"].runtimeClasspath.asPath
-    methods = { cp ->
+    methodsForCp = { cp ->
         julietMethods {
             val specificBans = listOf(
                 "null_check_after_deref",
@@ -155,7 +158,7 @@ tasks.register<RunAnalyzerExtendedTask>("analyzeJulietCwe476") {
 }
 
 
-tasks.register<RunAnalyzerExtendedTask>("analyzeJulietCwe690") {
+tasks.register<RunAnalyzerTask>("analyzeJulietCwe690") {
     println("Registering '${this.name}' task")
     dependsOn(tasks.compileJava)
 
@@ -170,7 +173,7 @@ tasks.register<RunAnalyzerExtendedTask>("analyzeJulietCwe690") {
     )
     dbLocation = "index.db"
     classpath = sourceSets["main"].runtimeClasspath.asPath
-    methods = { cp ->
+    methodsForCp = { cp ->
         julietMethods {
             val specificBans = listOf<String>()
             julietClasses(cp)
@@ -185,7 +188,7 @@ tasks.register<RunAnalyzerExtendedTask>("analyzeJulietCwe690") {
 }
 
 
-tasks.register<RunAnalyzerExtendedTask>("analyzeJulietCwe563") {
+tasks.register<RunAnalyzerTask>("analyzeJulietCwe563") {
     println("Registering '${this.name}' task")
     dependsOn(tasks.compileJava)
 
@@ -200,7 +203,7 @@ tasks.register<RunAnalyzerExtendedTask>("analyzeJulietCwe563") {
     )
     dbLocation = "index.db"
     classpath = sourceSets["main"].runtimeClasspath.asPath
-    methods = { cp ->
+    methodsForCp = { cp ->
         julietMethods {
             val specificBans = listOf(
                 // Unused variables are already optimized out by cfg
@@ -229,7 +232,7 @@ tasks.register<RunAnalyzerExtendedTask>("analyzeJulietCwe563") {
     resolver = julietResolver(563)
 }
 
-tasks.register<RunAnalyzerExtendedTask>("analyzeJulietCwe89") {
+tasks.register<RunAnalyzerTask>("analyzeJulietCwe89") {
     println("Registering '${this.name}' task")
     dependsOn(tasks.compileJava)
 
@@ -244,7 +247,7 @@ tasks.register<RunAnalyzerExtendedTask>("analyzeJulietCwe89") {
     )
     dbLocation = "index.db"
     classpath = sourceSets["main"].runtimeClasspath.asPath
-    methods = { cp ->
+    methodsForCp = { cp ->
         julietMethods {
             val specificBans = listOf(
                 // Not working yet (#156)
