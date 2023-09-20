@@ -21,6 +21,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
+import org.byteflow.resolveApproximationsClassPath
 import org.byteflow.runAnalysis
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
@@ -38,6 +39,7 @@ import org.jacodb.api.JcClassProcessingTask
 import org.jacodb.api.JcClasspath
 import org.jacodb.api.JcMethod
 import org.jacodb.api.cfg.JcInst
+import org.jacodb.approximation.Approximations
 import org.jacodb.impl.features.InMemoryHierarchy
 import org.jacodb.impl.features.Usages
 import org.jacodb.impl.jacodb
@@ -87,10 +89,11 @@ abstract class RunAnalyzerTask : DefaultTask() {
                     persistent(it)
                 }
                 loadByteCode(classpathAsFiles)
-                installFeatures(InMemoryHierarchy, Usages)
+                installFeatures(InMemoryHierarchy, Usages, Approximations)
             }
             logger.quiet("jacodb created, creating cp...")
-            jacodb.classpath(classpathAsFiles)
+            val approximationsCp = resolveApproximationsClassPath()
+            jacodb.classpath(classpathAsFiles + approximationsCp, listOf(Approximations))
         }
         logger.quiet("cp created")
 
@@ -215,11 +218,12 @@ abstract class RunAnalyzerExtendedTask : DefaultTask() {
                     persistent(it)
                 }
                 loadByteCode(classpathAsFiles)
-                installFeatures(InMemoryHierarchy, Usages)
+                installFeatures(InMemoryHierarchy, Usages, Approximations)
             }
             logger.quiet("db created")
             logger.quiet("Creating cp...")
-            db.classpath(classpathAsFiles)
+            val approximationsCp = resolveApproximationsClassPath()
+            db.classpath(classpathAsFiles + approximationsCp, listOf(Approximations))
         }
         logger.quiet("cp created")
 

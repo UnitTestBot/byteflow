@@ -32,11 +32,13 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToStream
 import org.byteflow.AnalysesOptions
 import org.byteflow.AnalysisType
+import org.byteflow.resolveApproximationsClassPath
 import org.byteflow.runAnalysis
 import org.jacodb.analysis.graph.newApplicationGraphForAnalysis
 import org.jacodb.analysis.sarif.sarifReportFromVulnerabilities
 import org.jacodb.api.JcClassOrInterface
 import org.jacodb.api.JcClassProcessingTask
+import org.jacodb.approximation.Approximations
 import org.jacodb.impl.features.InMemoryHierarchy
 import org.jacodb.impl.features.Usages
 import org.jacodb.impl.jacodb
@@ -101,10 +103,11 @@ class Cli : CliktCommand("byteflow") {
                     persistent(it)
                 }
                 loadByteCode(classpathAsFiles)
-                installFeatures(InMemoryHierarchy, Usages)
+                installFeatures(InMemoryHierarchy, Usages, Approximations)
             }
             logger.info { "jacodb created, creating cp..." }
-            jacodb.classpath(classpathAsFiles)
+            val approximationsCp = resolveApproximationsClassPath()
+            jacodb.classpath(classpathAsFiles + approximationsCp, listOf(Approximations))
         }
         logger.info { "cp created" }
 
