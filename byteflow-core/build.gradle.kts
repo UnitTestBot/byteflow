@@ -10,6 +10,10 @@ dependencies {
     implementation(Libs.kotlin_logging)
 }
 
+tasks.test {
+    maxHeapSize = "2G"
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {

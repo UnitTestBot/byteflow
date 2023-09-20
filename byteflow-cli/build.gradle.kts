@@ -23,10 +23,6 @@ tasks.startScripts {
     applicationName = rootProject.name
 }
 
-tasks.test {
-    maxHeapSize = "2G"
-}
-
 // tasks.shadowJar {
 //     archiveBaseName = rootProject.name
 //     archiveClassifier = ""
