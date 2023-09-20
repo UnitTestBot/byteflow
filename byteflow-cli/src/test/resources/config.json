@@ -1,9 +1,13 @@
 {
   "analyses": {
-    "NPE": {},
-    "Unused": {
-      "UnitResolver": "class"
+    "NPE": {
+      "UnitResolver": "package"
     },
-    "SQL": {}
+    "Unused": {
+      "UnitResolver": "package"
+    },
+    "SQL": {
+      "UnitResolver": "package"
+    }
   }
 }
