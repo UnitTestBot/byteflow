@@ -7,6 +7,7 @@ import org.jacodb.api.TypeName
 import org.jacodb.api.analysis.JcApplicationGraph
 import org.jacodb.api.ext.cfg.callExpr
 import org.jacodb.api.ext.findClass
+import org.jacodb.api.ext.findDeclaredMethodOrNull
 import org.usvm.PathSelectionStrategy
 import org.usvm.SolverType
 import org.usvm.UMachineOptions
@@ -24,6 +25,8 @@ import org.usvm.api.targets.TaintAnalysis.TaintTarget
 import org.usvm.api.targets.TaintConfiguration
 import org.usvm.api.targets.TaintMethodSink
 import org.usvm.api.targets.TaintMethodSource
+import org.usvm.api.targets.TaintPassThrough
+import org.usvm.api.targets.ThisArgument
 import org.usvm.machine.JcMachine
 import org.usvm.targets.UTargetController
 
@@ -50,6 +53,8 @@ private fun analyzeSqlVulnerabilitiesWithUsvm(
     timeoutMillis: Long,
     vulnerabilities: List<VulnerabilityInstance>
 ): List<VulnerabilityInstance> {
+    System.err.println("RUN USVM ANALYSIS")
+
     val config = mkSqlInjectionConfig(graph.classpath)
 
     val vulnTargets = mutableMapOf<TaintTarget, VulnerabilityInstance>()
@@ -126,6 +131,31 @@ private fun mkSqlInjectionConfig(cp: JcClasspath): TaintConfiguration {
         .forEach { sources[it] = listOf(TaintMethodSource(it, ConstantTrue, AssignMark(Result, SqlInjection))) }
 
 
+    val passThrough = mutableMapOf<JcMethod, List<TaintPassThrough>>()
+    val sb = cp.findClass("java.lang.StringBuilder")
+    sb.declaredMethods
+        .filter { m -> m.name == "append" && m.parameters.singleOrNull()?.type?.isString ?: false }
+        .forEach { method ->
+            passThrough[method] = listOf(
+                TaintPassThrough(
+                    method,
+                    CallParameterContainsMark(Argument(0u), SqlInjection),
+                    AssignMark(ThisArgument, SqlInjection)
+                )
+            )
+        }
+    sb.declaredMethods
+        .filter { it.name == "toString" && it.returnType.isString }
+        .forEach { method ->
+            passThrough[method] = listOf(
+                TaintPassThrough(
+                    method,
+                    CallParameterContainsMark(ThisArgument, SqlInjection),
+                    AssignMark(Result, SqlInjection)
+                )
+            )
+        }
+
     val sinks = mutableMapOf<JcMethod, List<TaintMethodSink>>()
 
     val sqlStatements = listOf(
@@ -150,7 +180,7 @@ private fun mkSqlInjectionConfig(cp: JcClasspath): TaintConfiguration {
         entryPoints = emptyMap(),
         methodSources = sources,
         fieldSources = emptyMap(),
-        passThrough = emptyMap(),
+        passThrough = passThrough,
         cleaners = emptyMap(),
         methodSinks = sinks,
         fieldSinks = emptyMap()

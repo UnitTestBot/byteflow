@@ -13,8 +13,8 @@ dependencies {
     implementation(Libs.sarif4k)
 }
 
-group = "com.github.UnitTestBot.byteflow"
-version = "0.1.0-SNAPSHOT"
+group = "io.github.UnitTestBot.byteflow"
+version = "0.0.13"
 
 gradlePlugin {
     website = "https://github.com/UnitTestBot/byteflow"

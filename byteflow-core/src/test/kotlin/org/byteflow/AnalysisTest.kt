@@ -28,6 +28,7 @@ import org.jacodb.impl.features.Usages
 import org.jacodb.impl.jacodb
 import java.io.File
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class AnalysisTest {
     @Test
@@ -39,13 +40,13 @@ class AnalysisTest {
     @Test
     fun `test sql injection FP`() {
         val vulnerabilities = runAnalysis<SqlInjectionSample>("SQL", useUsvm = true)
-        println(vulnerabilities.size)
+        assertEquals(0, vulnerabilities.size)
     }
 
     @Test
     fun `test sql injection TP`() {
         val vulnerabilities = runAnalysis<SqlInjectionSample2>("SQL", useUsvm = true)
-        println(vulnerabilities.size)
+        assertEquals(1, vulnerabilities.size)
     }
 
     private inline fun <reified T> runAnalysis(analysis: AnalysisType, useUsvm: Boolean) = runBlocking {

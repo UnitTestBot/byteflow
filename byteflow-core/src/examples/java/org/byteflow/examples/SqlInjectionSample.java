@@ -58,9 +58,9 @@ public class SqlInjectionSample {
 
     private boolean checkUserIsAdminDev(String userId, String adminName) {
         String adminId;
-        if ("root_1".equals(adminName)) {
+        if (adminName.equals("root_1")) {
             adminId = "1";
-        } else if ("root_2".equals(adminName)) {
+        } else if (adminName.equals("root_2")) {
             adminId = "2";
         } else {
             adminId = "0";

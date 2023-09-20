@@ -108,7 +108,7 @@ abstract class RunAnalyzerTask : DefaultTask() {
         runBlocking {
             cp.execute(object : JcClassProcessingTask {
                 override fun process(clazz: JcClassOrInterface) {
-                    if (startClassesAsList.any { clazz.name.startsWith(it) }) {
+                    if (startClassesAsList.any { clazz.name == it }) {
                         startJcClasses.add(clazz)
                     }
                 }
