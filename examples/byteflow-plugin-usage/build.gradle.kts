@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm") version "1.9.10"
-    id("io.github.UnitTestBot.byteflow") version "0.1.0-SNAPSHOT"
+    java
+    id("io.github.UnitTestBot.byteflow") version "6575bc9537"
     // id("byteflow-gradle") version "..."
 }
 
@@ -17,18 +17,28 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    compileOnly("org.jetbrains:annotations:24.0.1")
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+}
+
 byteflow {
     configFile = layout.projectDirectory.file("configs/config.json")
     // startClasses = listOf("com.example.NpeExamples")
     // startClasses = listOf("com.example.SqlInjectionSample")
     // startClasses = listOf("com.example.SqlInjectionSample2")
     startClasses = listOf(
-        "com.example.NpeExamples",
+//        "com.example.NpeExamples",
         "com.example.SqlInjectionSample",
         "com.example.SqlInjectionSample2",
     )
     classpath = sourceSets["main"].runtimeClasspath.asPath
     dbLocation = "index.db"
+
+    useUsvmAnalysis = project.findProperty("useUsvmAnalysis")?.toString()?.toBoolean() ?: false
 }
 
 tasks.runAnalyzer {
