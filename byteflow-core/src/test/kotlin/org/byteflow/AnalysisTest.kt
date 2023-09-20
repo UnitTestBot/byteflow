@@ -57,7 +57,7 @@ class AnalysisTest {
             installFeatures(InMemoryHierarchy, Usages, Approximations)
         }
 
-        val approximationsCp = resolveApproximationsClassPath()
+        val approximationsCp = resolveApproximationsClassPath(File("."))
         val cp = db.classpath(classpathAsFiles + approximationsCp, listOf(Approximations))
 
         val clazz = cp.findClass<T>()

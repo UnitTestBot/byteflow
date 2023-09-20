@@ -106,7 +106,7 @@ class Cli : CliktCommand("byteflow") {
                 installFeatures(InMemoryHierarchy, Usages, Approximations)
             }
             logger.info { "jacodb created, creating cp..." }
-            val approximationsCp = resolveApproximationsClassPath()
+            val approximationsCp = resolveApproximationsClassPath(File("."))
             jacodb.classpath(classpathAsFiles + approximationsCp, listOf(Approximations))
         }
         logger.info { "cp created" }

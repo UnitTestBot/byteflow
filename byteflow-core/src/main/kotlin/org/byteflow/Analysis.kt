@@ -71,15 +71,15 @@ fun runAnalysis(
     return analyzeVulnerabilitiesWithUsvm(analysis, options, graph, methods, timeoutMillis, vulnerabilities)
 }
 
-fun resolveApproximationsClassPath() = listOf(
-    JarUnpacker.unpackFromResources("approximations/api.jar"),
-    JarUnpacker.unpackFromResources("approximations/approximations.jar")
+fun resolveApproximationsClassPath(unpackDir: File) = listOf(
+    JarUnpacker.unpackFromResources(unpackDir, "approximations/api.jar"),
+    JarUnpacker.unpackFromResources(unpackDir, "approximations/approximations.jar")
 )
 
 private object JarUnpacker {
-    fun unpackFromResources(name: String): File {
+    fun unpackFromResources(unpackDir: File, name: String): File {
         val resource = this::class.java.classLoader.getResourceAsStream(name)
-        val unpacked = File(name).also {
+        val unpacked = unpackDir.resolve(name).also {
             it.parentFile.mkdirs()
         }
         resource.use { inp -> unpacked.outputStream().use { inp.copyTo(it) } }

@@ -92,7 +92,7 @@ abstract class RunAnalyzerTask : DefaultTask() {
                 installFeatures(InMemoryHierarchy, Usages, Approximations)
             }
             logger.quiet("jacodb created, creating cp...")
-            val approximationsCp = resolveApproximationsClassPath()
+            val approximationsCp = resolveApproximationsClassPath(project.layout.buildDirectory.asFile.get())
             jacodb.classpath(classpathAsFiles + approximationsCp, listOf(Approximations))
         }
         logger.quiet("cp created")
@@ -222,7 +222,7 @@ abstract class RunAnalyzerExtendedTask : DefaultTask() {
             }
             logger.quiet("db created")
             logger.quiet("Creating cp...")
-            val approximationsCp = resolveApproximationsClassPath()
+            val approximationsCp = resolveApproximationsClassPath(project.layout.buildDirectory.asFile.get())
             db.classpath(classpathAsFiles + approximationsCp, listOf(Approximations))
         }
         logger.quiet("cp created")
