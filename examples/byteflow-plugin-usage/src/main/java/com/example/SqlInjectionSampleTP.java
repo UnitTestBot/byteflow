@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 @SuppressWarnings({"unused", "DuplicatedCode"})
-public class SqlInjectionSample {
+public class SqlInjectionSampleTP {
     boolean isProduction;
 
     public boolean isAdmin(String userId) throws SQLException {
@@ -22,7 +22,7 @@ public class SqlInjectionSample {
         if (isProduction) {
             isAdmin = checkUserIsAdminProd(userId, adminUserName);
         } else {
-            isAdmin = checkUserIsAdminDev(userId, adminUserName);
+            isAdmin = checkUserIsAdminProd(userId, adminUserName);
         }
 
         return isAdmin;

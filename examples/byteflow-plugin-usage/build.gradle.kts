@@ -27,13 +27,10 @@ java {
 
 byteflow {
     configFile = layout.projectDirectory.file("configs/config.json")
-    // startClasses = listOf("com.example.NpeExamples")
-    // startClasses = listOf("com.example.SqlInjectionSample")
-    // startClasses = listOf("com.example.SqlInjectionSample2")
     startClasses = listOf(
-//        "com.example.NpeExamples",
-        "com.example.SqlInjectionSample",
-        "com.example.SqlInjectionSample2",
+        // "com.example.NpeExamples",
+        "com.example.SqlInjectionSampleFP",
+        "com.example.SqlInjectionSampleTP",
     )
     classpath = sourceSets["main"].runtimeClasspath.asPath
     dbLocation = "index.db"
