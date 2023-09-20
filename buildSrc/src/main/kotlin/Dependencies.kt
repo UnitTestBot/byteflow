@@ -4,7 +4,7 @@ object Versions {
     const val clikt = "4.2.0"
     const val dokka = "1.8.20"
     const val gradle_plugin_publish = "1.2.1"
-    const val jacodb = "lipen~sarif4k-SNAPSHOT"
+    const val jacodb = "6a37be4272"
     const val junit = "5.9.2"
     const val kotlin = "1.9.10"
     const val kotlin_logging = "5.1.0"
@@ -71,7 +71,7 @@ object Libs {
     )
 
     // https://github.com/UnitTestBot/jacodb
-    private const val jacodb = "com.github.UnitTestBot.jacodb"
+    private const val jacodb = "com.github.Saloed.jacodb"
     val jacodb_api = dep(
         group = jacodb,
         name = "jacodb-api",
