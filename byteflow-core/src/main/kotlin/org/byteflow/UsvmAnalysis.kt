@@ -54,6 +54,7 @@ private fun analyzeSqlVulnerabilitiesWithUsvm(
     vulnerabilities: List<VulnerabilityInstance>
 ): List<VulnerabilityInstance> {
     System.err.println("RUN USVM ANALYSIS")
+    System.err.println("Vulnerabilities before: ${vulnerabilities.size}")
 
     val config = mkSqlInjectionConfig(graph.classpath)
 
