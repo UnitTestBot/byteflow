@@ -50,6 +50,7 @@ class ByteFlowPlugin : Plugin<Project> {
             startClasses.convention(extension.startClasses)
             classpath.convention(extension.classpath)
             outputPath.convention(extension.outputPath)
+            useUsvmAnalysis.convention(extension.useUsvmAnalysis)
         }
     }
 }
