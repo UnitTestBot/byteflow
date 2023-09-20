@@ -266,8 +266,4 @@ abstract class RunAnalyzerExtendedTask : DefaultTask() {
 
         logger.quiet("All done in %.3f s".format(timeStart.elapsedNow().toDouble(DurationUnit.SECONDS)))
     }
-
-    companion object {
-        const val NAME: String = "runAnalyzerEx"
-    }
 }
