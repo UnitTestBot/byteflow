@@ -59,10 +59,6 @@ java {
     }
 }
 
-tasks.runAnalyzer {
-    dependsOn(tasks.compileJava)
-}
-
 private val commonJulietBans = listOf(
     // TODO: containers not supported
     "_72", "_73", "_74",
