@@ -102,12 +102,14 @@ abstract class RunAnalyzerTask : DefaultTask() {
 
         logger.quiet("Forming the list of methods to analyze...")
         val timeStartMethods = TimeSource.Monotonic.markNow()
-        @Suppress("LocalVariableName")
-        val _methods = methods.get().toMutableList()
-        methodsForCp.orNull?.let {
-            _methods += it(cp)
+
+        val methods = run {
+            val m = methods.get().toMutableList()
+            if (methodsForCp.isPresent) {
+                m += methodsForCp.get()(cp)
+            }
+            m.distinct()
         }
-        val methods = _methods.distinct()
         logger.quiet("Found ${methods.size} methods to analyze in ${timeStartMethods.elapsedNow()}")
 
         logger.quiet("Creating application graph...")
