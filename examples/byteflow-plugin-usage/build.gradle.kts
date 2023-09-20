@@ -3,7 +3,7 @@ import org.byteflow.gradle.analysisConfig
 import org.byteflow.gradle.getMethodsForClasses
 
 plugins {
-    kotlin("jvm") version "1.9.10"
+    `java-library`
     id("io.github.UnitTestBot.byteflow") version "0.1.0-SNAPSHOT"
     // id("byteflow-gradle") version "..."
 }
@@ -19,6 +19,16 @@ buildscript {
 
 repositories {
     mavenCentral()
+}
+
+dependencies {
+    compileOnly("org.jetbrains:annotations:24.0.1")
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
 }
 
 byteflow {
