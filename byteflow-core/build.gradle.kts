@@ -2,6 +2,12 @@ plugins {
     `maven-publish`
 }
 
+sourceSets {
+    create("examples")
+}
+
+val examplesImplementation by configurations.getting
+
 dependencies {
     api(Libs.jacodb_api)
     api(Libs.jacodb_core)
@@ -9,6 +15,8 @@ dependencies {
     implementation(Libs.kotlinx_coroutines_core)
 
     implementation(Libs.kotlin_logging)
+
+    // examplesCompileOnly("org.jetbrains:annotations:24.0.1")
 }
 
 publishing {
