@@ -12,7 +12,7 @@ import org.jacodb.impl.features.hierarchyExt
 import kotlin.time.ExperimentalTime
 
 plugins {
-    kotlin("jvm") version "1.9.10"
+    java
     id("io.github.UnitTestBot.byteflow") version "0.1.0-SNAPSHOT"
 }
 
@@ -50,6 +50,12 @@ sourceSets {
             // SQL
             srcDir("juliet-java-test-suite/juliet-cwe89/src/main/java")
         }
+    }
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
     }
 }
 
