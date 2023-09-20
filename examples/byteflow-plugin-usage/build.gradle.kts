@@ -19,10 +19,13 @@ buildscript {
 
 repositories {
     mavenCentral()
+    maven("https://jitpack.io")
+    mavenLocal()
 }
 
 dependencies {
     compileOnly("org.jetbrains:annotations:24.0.1")
+    implementation("org.byteflow:cli:0.1.0-SNAPSHOT")
 }
 
 java {
@@ -45,6 +48,20 @@ byteflow {
 tasks.runAnalyzer {
     dependsOn(tasks.compileJava)
 }
+
+// ===
+
+tasks.register<JavaExec>("go") {
+    group = "analysis"
+    description = "Example analysis"
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass = "org.byteflow.cli.CliKt"
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
+
+// ===
 
 // ------------------------------------------------------------------------------------------------
 // Specific analysis tasks.

@@ -1,6 +1,7 @@
 plugins {
     kotlin("plugin.serialization")
     application
+    `maven-publish`
     // id(Plugins.Shadow.id)
 }
 
@@ -21,6 +22,19 @@ application {
 
 tasks.startScripts {
     applicationName = rootProject.name
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
+    repositories {
+        maven {
+            url = uri(layout.buildDirectory.dir("repository"))
+        }
+    }
 }
 
 // tasks.shadowJar {
