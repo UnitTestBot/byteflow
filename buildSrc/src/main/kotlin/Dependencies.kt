@@ -1,6 +1,7 @@
 @file:Suppress("PublicApiImplicitType", "MemberVisibilityCanBePrivate", "unused", "ConstPropertyName")
 
 object Versions {
+    const val annotations = "24.0.1"
     const val clikt = "4.2.0"
     const val dokka = "1.8.20"
     const val gradle_plugin_publish = "1.2.1"
@@ -93,6 +94,13 @@ object Libs {
         group = "io.github.detekt.sarif4k",
         name = "sarif4k",
         version = Versions.sarif4k
+    )
+
+    // https://github.com/JetBrains/java-annotations
+    val annotations = dep(
+        group = "org.jetbrains",
+        name = "annotations",
+        version = Versions.annotations
     )
 }
 
