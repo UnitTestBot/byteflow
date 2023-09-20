@@ -193,7 +193,7 @@ val defaultResolver: (JcInst) -> String = { inst ->
     val registeredLocation = inst.location.method.declaration.location
     val classFileBaseName = inst.location.method.enclosingClass.name.replace('.', '/')
     if (registeredLocation.path.contains("build/classes/")) {
-        val src = registeredLocation.path.replace("build/classes/[^/]+/[^/]+".toRegex()) {
+        val src = registeredLocation.path.replace("build/classes/(\\w+)/(\\w+)".toRegex()) {
             val (language, sourceSet) = it.destructured
             "src/${sourceSet}/${language}/java"
         }
