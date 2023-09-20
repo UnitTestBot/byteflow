@@ -132,17 +132,7 @@ abstract class RunAnalyzerTask : DefaultTask() {
         //     logger.quiet("  - $v")
         // }
 
-        val resolver = resolver.orNull
-            ?: { inst ->
-                val registeredLocation = inst.location.method.declaration.location
-                val classFileBaseName = inst.location.method.enclosingClass.name.replace('.', '/')
-                if (registeredLocation.path.contains("build/classes/java/main")) {
-                    val src = registeredLocation.path.replace("build/classes/java/main", "src/main/java")
-                    "file://" + File(src).resolve(classFileBaseName.substringBefore('$')).path + ".java"
-                } else {
-                    File(registeredLocation.path).resolve(classFileBaseName).path + ".class"
-                }
-            }
+        val resolver = resolver.orNull ?: defaultResolver
 
         logger.quiet("Preparing report...")
         val sarif = sarifReportFromVulnerabilities(vulnerabilities) { resolver(it) }
@@ -197,4 +187,18 @@ fun Project.getMethodsForClasses(
     }
 
     return startJcMethods
+}
+
+val defaultResolver: (JcInst) -> String = { inst ->
+    val registeredLocation = inst.location.method.declaration.location
+    val classFileBaseName = inst.location.method.enclosingClass.name.replace('.', '/')
+    if (registeredLocation.path.contains("build/classes/")) {
+        val src = registeredLocation.path.replace("build/classes/[^/]+/[^/]+".toRegex()) {
+            val (language, sourceSet) = it.destructured
+            "src/${sourceSet}/${language}/java"
+        }
+        "file://" + File(src).resolve(classFileBaseName.substringBefore('$')).path + ".java"
+    } else {
+        File(registeredLocation.path).resolve(classFileBaseName).path + ".class"
+    }
 }
