@@ -86,7 +86,7 @@ fun julietClasses(
 }
 
 fun julietMethods(classes: () -> List<JcClassOrInterface>): List<JcMethod> {
-    logger.quiet("Searching for classes...")
+    logger.quiet("Searching classes...")
     val startClasses = classes()
 
     logger.quiet("startClasses: (${startClasses.size})")
