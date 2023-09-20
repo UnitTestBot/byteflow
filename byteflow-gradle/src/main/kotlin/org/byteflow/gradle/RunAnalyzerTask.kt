@@ -43,6 +43,7 @@ import org.jacodb.impl.features.Usages
 import org.jacodb.impl.jacodb
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
 
@@ -192,14 +193,17 @@ abstract class RunAnalyzerExtendedTask : DefaultTask() {
     @TaskAction
     fun analyze() {
         val timeStart = TimeSource.Monotonic.markNow()
-        logger.quiet("start at $timeStart")
+        logger.quiet("Start analysis at $timeStart")
 
         val config = config.get()
+        logger.quiet("config = $config")
 
         val classpathAsFiles = classpath.get().split(File.pathSeparatorChar).sorted().map { File(it) }
         logger.quiet("classpath = $classpathAsFiles")
+
+        logger.quiet("Creating db...")
+        val timeStartCp = TimeSource.Monotonic.markNow()
         val cp = runBlocking {
-            logger.quiet("Creating db...")
             val db = jacodb {
                 dbLocation.orNull?.let {
                     logger.quiet("Using db location: '$it'")
@@ -212,23 +216,26 @@ abstract class RunAnalyzerExtendedTask : DefaultTask() {
             logger.quiet("Creating cp...")
             db.classpath(classpathAsFiles)
         }
-        logger.quiet("cp created")
+        logger.quiet("cp created in ${timeStartCp.elapsedNow()}")
 
         val methods = methods.get()(cp)
 
         logger.quiet("Creating application graph...")
+        val timeStartGraph = TimeSource.Monotonic.markNow()
         val graph = runBlocking {
             cp.newApplicationGraphForAnalysis()
         }
-        logger.quiet("Application graph created")
+        logger.quiet("Application graph created in ${timeStartGraph.elapsedNow()}")
 
         logger.quiet("Analyzing...")
+        val timeStartAnalysis = TimeSource.Monotonic.markNow()
         val vulnerabilities = config.analyses
             .flatMap { (analysis, options) ->
                 logger.quiet("running '$analysis' analysis...")
                 runAnalysis(analysis, options, graph, methods)
             }
-        logger.quiet("Analysis done. Found ${vulnerabilities.size} vulnerabilities")
+        logger.quiet("Analysis done in ${timeStartAnalysis.elapsedNow()}")
+        logger.quiet("Found ${vulnerabilities.size} vulnerabilities")
         // for (v in vulnerabilities) {
         //     logger.quiet("  - $v")
         // }
@@ -257,7 +264,7 @@ abstract class RunAnalyzerExtendedTask : DefaultTask() {
             json.encodeToStream(sarif, stream)
         }
 
-        logger.quiet("All done in ${timeStart.elapsedNow()}")
+        logger.quiet("All done in %.3f s".format(timeStart.elapsedNow().toDouble(DurationUnit.SECONDS)))
     }
 
     companion object {
