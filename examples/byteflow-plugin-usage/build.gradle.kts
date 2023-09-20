@@ -1,6 +1,6 @@
 plugins {
     java
-    id("io.github.UnitTestBot.byteflow") version "6575bc9537"
+    id("io.github.UnitTestBot.byteflow") version "c09d96f3c5"
     // id("byteflow-gradle") version "..."
 }
 
