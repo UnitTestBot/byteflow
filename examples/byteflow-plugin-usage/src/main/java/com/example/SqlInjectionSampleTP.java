@@ -33,7 +33,6 @@ public class SqlInjectionSampleTP {
         String adminId;
         try (Connection dbConnection = DriverManager.getConnection("url://127.0.0.1:8080");
              Statement statement = dbConnection.createStatement()) {
-            // SECS: potential SQL injection
             ResultSet rs = statement.executeQuery("SELECT id from users where name='" + adminName + "'");
             if (rs.next()) {
                 adminId = rs.getString(0);
