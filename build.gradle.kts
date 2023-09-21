@@ -41,6 +41,12 @@ subprojects {
             jvmTarget = "1.8"
         }
     }
+
+    tasks.withType<Test> {
+        useJUnitPlatform {
+            excludeTags = setOf("slow")
+        }
+    }
 }
 
 tasks.wrapper {

@@ -25,18 +25,21 @@ import org.jacodb.approximation.Approximations
 import org.jacodb.impl.features.InMemoryHierarchy
 import org.jacodb.impl.features.Usages
 import org.jacodb.impl.jacodb
+import org.junit.jupiter.api.Tag
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class AnalysisTest {
     @Test
+    @Tag("slow")
     fun `test sql injection FP`() {
         val vulnerabilities = runAnalysis<SqlInjectionSampleFP>("SQL", useUsvm = true)
         assertEquals(0, vulnerabilities.size)
     }
 
     @Test
+    @Tag("slow")
     fun `test sql injection TP`() {
         val vulnerabilities = runAnalysis<SqlInjectionSampleTP>("SQL", useUsvm = true)
         assertEquals(1, vulnerabilities.size)

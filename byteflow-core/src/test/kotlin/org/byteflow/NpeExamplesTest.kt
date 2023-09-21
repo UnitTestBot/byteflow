@@ -8,6 +8,7 @@ import org.jacodb.api.JcClassProcessingTask
 import org.jacodb.impl.features.InMemoryHierarchy
 import org.jacodb.impl.features.Usages
 import org.jacodb.impl.jacodb
+import org.junit.jupiter.api.Tag
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.test.Test
@@ -15,6 +16,7 @@ import kotlin.test.assertTrue
 
 class NpeExamplesTest {
     @Test
+    @Tag("slow")
     fun `test NPE analysis of NpeExamples`() {
         val classpath = System.getProperty("java.class.path")
         val classpathAsFiles = classpath.split(File.pathSeparatorChar).sorted().map { File(it) }
