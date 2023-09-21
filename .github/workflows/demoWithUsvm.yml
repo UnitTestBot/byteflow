@@ -27,6 +27,9 @@ jobs:
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v2
 
+      - name: Build and publish Gradle plugin
+        run: ./gradlew :core:publishToMavenLocal :gradle:publish --stacktrace --scan
+
       - name: Run analysis on sample project
         working-directory: examples/byteflow-plugin-usage
         run: ./gradlew runAnalyzer -PuseUsvmAnalysis=true
