@@ -47,5 +47,4 @@ public class SqlInjectionSampleTP {
 
         return adminId.equals(userId);
     }
-
 }
