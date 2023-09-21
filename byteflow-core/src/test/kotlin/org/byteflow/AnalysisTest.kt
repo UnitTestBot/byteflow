@@ -18,8 +18,8 @@ package org.byteflow
 
 import kotlinx.coroutines.runBlocking
 import org.byteflow.examples.NpeExamples
-import org.byteflow.examples.SqlInjectionSample
 import org.byteflow.examples.SqlInjectionSample2
+import org.byteflow.examples.SqlInjectionSample1
 import org.jacodb.analysis.graph.newApplicationGraphForAnalysis
 import org.jacodb.api.ext.findClass
 import org.jacodb.approximation.Approximations
@@ -39,13 +39,13 @@ class AnalysisTest {
 
     @Test
     fun `test sql injection FP`() {
-        val vulnerabilities = runAnalysis<SqlInjectionSample>("SQL", useUsvm = true)
+        val vulnerabilities = runAnalysis<SqlInjectionSample2>("SQL", useUsvm = true)
         assertEquals(0, vulnerabilities.size)
     }
 
     @Test
     fun `test sql injection TP`() {
-        val vulnerabilities = runAnalysis<SqlInjectionSample2>("SQL", useUsvm = true)
+        val vulnerabilities = runAnalysis<SqlInjectionSample1>("SQL", useUsvm = true)
         assertEquals(1, vulnerabilities.size)
     }
 

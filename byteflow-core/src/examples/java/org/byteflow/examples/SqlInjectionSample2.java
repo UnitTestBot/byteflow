@@ -22,7 +22,7 @@ public class SqlInjectionSample2 {
         if (isProduction) {
             isAdmin = checkUserIsAdminProd(userId, adminUserName);
         } else {
-            isAdmin = checkUserIsAdminProd(userId, adminUserName);
+            isAdmin = checkUserIsAdminDev(userId, adminUserName);
         }
 
         return isAdmin;

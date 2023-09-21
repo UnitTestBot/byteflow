@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 @SuppressWarnings({"unused", "DuplicatedCode"})
-public class SqlInjectionSample {
+public class SqlInjectionSample1 {
     boolean isProduction;
 
     public boolean isAdmin(String userId) throws SQLException {
@@ -18,14 +18,7 @@ public class SqlInjectionSample {
             adminUserName = getAdminUserNameDev();
         }
 
-        boolean isAdmin;
-        if (isProduction) {
-            isAdmin = checkUserIsAdminProd(userId, adminUserName);
-        } else {
-            isAdmin = checkUserIsAdminDev(userId, adminUserName);
-        }
-
-        return isAdmin;
+        return checkUserIsAdmin(userId, adminUserName);
     }
 
     private String getAdminUserNameProd() {
@@ -36,7 +29,7 @@ public class SqlInjectionSample {
         return System.getenv("admin_name");
     }
 
-    private boolean checkUserIsAdminProd(String userId, String adminName) throws SQLException {
+    private boolean checkUserIsAdmin(String userId, String adminName) throws SQLException {
         String adminId;
         try (Connection dbConnection = DriverManager.getConnection("url://127.0.0.1:8080");
              Statement statement = dbConnection.createStatement()) {
@@ -55,18 +48,4 @@ public class SqlInjectionSample {
 
         return adminId.equals(userId);
     }
-
-    private boolean checkUserIsAdminDev(String userId, String adminName) {
-        String adminId;
-        if (adminName.equals("root_1")) {
-            adminId = "1";
-        } else if (adminName.equals("root_2")) {
-            adminId = "2";
-        } else {
-            adminId = "0";
-        }
-
-        return adminId.equals(userId);
-    }
-
 }
