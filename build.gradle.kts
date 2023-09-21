@@ -7,7 +7,13 @@ plugins {
     with(Plugins.Shadow) { id(id) version (version) } apply false
 }
 
+group = "org.byteflow"
+version = "0.1.0-SNAPSHOT"
+
 subprojects {
+    group = rootProject.group
+    version = rootProject.version
+
     apply(plugin = "kotlin")
 
     repositories {
