@@ -75,7 +75,7 @@ abstract class RunAnalyzerTask : DefaultTask() {
     @get:Optional
     @get:Input
     abstract val resolver: Property<(JcInst) -> String>
-    
+
     @get:Input
     abstract val useUsvmAnalysis: Property<Boolean>
 
@@ -83,7 +83,7 @@ abstract class RunAnalyzerTask : DefaultTask() {
     abstract val deduplicateThreadFlowLocations: Property<Boolean>
 
     init {
-        useUsvmAnalysis.convention(false))
+        useUsvmAnalysis.convention(false)
         deduplicateThreadFlowLocations.convention(true)
     }
 
@@ -136,6 +136,7 @@ abstract class RunAnalyzerTask : DefaultTask() {
         logger.quiet("Application graph created in ${timeStartGraph.elapsedNow()}")
 
         logger.quiet("Analyzing...")
+        val timeStartAnalysis = TimeSource.Monotonic.markNow()
         val useUsvm = useUsvmAnalysis.get()
         val vulnerabilities = config.analyses
             .flatMap { (analysis, options) ->
