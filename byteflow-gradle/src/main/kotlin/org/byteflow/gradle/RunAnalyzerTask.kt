@@ -195,7 +195,7 @@ val defaultResolver: (JcInst) -> String = { inst ->
     if (registeredLocation.path.contains("build/classes/")) {
         val src = registeredLocation.path.replace("build/classes/(\\w+)/(\\w+)".toRegex()) {
             val (language, sourceSet) = it.destructured
-            "src/${sourceSet}/${language}/java"
+            "src/${sourceSet}/${language}"
         }
         "file://" + File(src).resolve(classFileBaseName.substringBefore('$')).path + ".java"
     } else {
