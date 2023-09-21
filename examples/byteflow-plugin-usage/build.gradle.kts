@@ -34,7 +34,7 @@ java {
 byteflow {
     configFile = layout.projectDirectory.file("configs/config.json")
     startClasses = listOf(
-        "com.example.NpeExamples",
+        // "com.example.NpeExamples",
         "com.example.SqlInjectionSampleFP",
         "com.example.SqlInjectionSampleTP",
     )
