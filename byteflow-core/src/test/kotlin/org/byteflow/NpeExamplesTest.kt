@@ -11,6 +11,7 @@ import org.jacodb.impl.jacodb
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.test.Test
+import kotlin.test.assertTrue
 
 class NpeExamplesTest {
     @Test
@@ -59,6 +60,7 @@ class NpeExamplesTest {
         val options = mapOf(
             "UnitResolver" to "singleton"
         )
-        runAnalysis("NPE", options, graph, startJcMethods)
+        val vulnerabilities = runAnalysis("NPE", options, graph, startJcMethods)
+        assertTrue(vulnerabilities.isNotEmpty())
     }
 }
