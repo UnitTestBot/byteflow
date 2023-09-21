@@ -35,8 +35,8 @@ byteflow {
     configFile = layout.projectDirectory.file("configs/config.json")
     startClasses = listOf(
         "com.example.NpeExamples",
-        "com.example.SqlInjectionSample1",
-        "com.example.SqlInjectionSample2",
+        "com.example.SqlInjectionSampleFP",
+        "com.example.SqlInjectionSampleTP",
     )
     classpath = sourceSets["main"].runtimeClasspath.asPath
     dbLocation = "index.db"
@@ -65,7 +65,7 @@ tasks.register<RunAnalyzerTask>("analyzeNpeExamples") {
     outputPath = "report-npe.sarif"
 }
 
-tasks.register<RunAnalyzerTask>("analyzeSqlInjectionSample1") {
+tasks.register<RunAnalyzerTask>("analyzeSqlInjectionSampleFP") {
     dependsOn(tasks.compileJava)
     config = analysisConfig(
         "SQL" to mapOf(
@@ -75,12 +75,12 @@ tasks.register<RunAnalyzerTask>("analyzeSqlInjectionSample1") {
     dbLocation = "index.db"
     classpath = sourceSets["main"].runtimeClasspath.asPath
     methodsForCp = { cp ->
-        getMethodsForClasses(cp, startClasses = listOf("com.example.SqlInjectionSample1"))
+        getMethodsForClasses(cp, startClasses = listOf("com.example.SqlInjectionSampleFP"))
     }
-    outputPath = "report-sql1.sarif"
+    outputPath = "report-sql-fp.sarif"
 }
 
-tasks.register<RunAnalyzerTask>("analyzeSqlInjectionSample2") {
+tasks.register<RunAnalyzerTask>("analyzeSqlInjectionSampleTP") {
     dependsOn(tasks.compileJava)
     config = analysisConfig(
         "SQL" to mapOf(
@@ -90,9 +90,9 @@ tasks.register<RunAnalyzerTask>("analyzeSqlInjectionSample2") {
     dbLocation = "index.db"
     classpath = sourceSets["main"].runtimeClasspath.asPath
     methodsForCp = { cp ->
-        getMethodsForClasses(cp, startClasses = listOf("com.example.SqlInjectionSample2"))
+        getMethodsForClasses(cp, startClasses = listOf("com.example.SqlInjectionSampleTP"))
     }
-    outputPath = "report-sql2.sarif"
+    outputPath = "report-sql-tp.sarif"
 }
 
 // ------------------------------------------------------------------------------------------------

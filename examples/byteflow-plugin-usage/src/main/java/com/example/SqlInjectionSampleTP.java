@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 @SuppressWarnings({"unused", "DuplicatedCode"})
-public class SqlInjectionSample2 {
+public class SqlInjectionSampleTP {
     boolean isProduction;
 
     public boolean isAdmin(String userId) throws SQLException {
