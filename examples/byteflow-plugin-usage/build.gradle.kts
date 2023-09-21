@@ -40,7 +40,6 @@ byteflow {
     )
     classpath = sourceSets["main"].runtimeClasspath.asPath
     dbLocation = "index.db"
-
     useUsvmAnalysis = project.findProperty("useUsvmAnalysis")?.toString()?.toBoolean() ?: false
 }
 
