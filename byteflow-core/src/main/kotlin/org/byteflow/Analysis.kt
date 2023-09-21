@@ -38,7 +38,7 @@ fun runAnalysis(
     graph: JcApplicationGraph,
     methods: List<JcMethod>,
     timeoutMillis: Long = Long.MAX_VALUE,
-    useUsvmAnalysis: Boolean = false
+    useUsvmAnalysis: Boolean = false,
 ): List<VulnerabilityInstance> {
     logger.info { "Launching analysis: '$analysis'" }
     val runner = when (analysis) {

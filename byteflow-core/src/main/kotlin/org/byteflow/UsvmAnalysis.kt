@@ -7,7 +7,6 @@ import org.jacodb.api.TypeName
 import org.jacodb.api.analysis.JcApplicationGraph
 import org.jacodb.api.ext.cfg.callExpr
 import org.jacodb.api.ext.findClass
-import org.jacodb.api.ext.findDeclaredMethodOrNull
 import org.usvm.PathSelectionStrategy
 import org.usvm.SolverType
 import org.usvm.UMachineOptions
@@ -36,7 +35,7 @@ fun analyzeVulnerabilitiesWithUsvm(
     graph: JcApplicationGraph,
     methods: List<JcMethod>,
     timeoutMillis: Long,
-    vulnerabilities: List<VulnerabilityInstance>
+    vulnerabilities: List<VulnerabilityInstance>,
 ): List<VulnerabilityInstance> = when (analysis) {
     "SQL" -> {
         analyzeSqlVulnerabilitiesWithUsvm(graph, methods, timeoutMillis, vulnerabilities)
@@ -51,7 +50,7 @@ private fun analyzeSqlVulnerabilitiesWithUsvm(
     graph: JcApplicationGraph,
     methods: List<JcMethod>,
     timeoutMillis: Long,
-    vulnerabilities: List<VulnerabilityInstance>
+    vulnerabilities: List<VulnerabilityInstance>,
 ): List<VulnerabilityInstance> {
     System.err.println("RUN USVM ANALYSIS")
     System.err.println("Vulnerabilities before: ${vulnerabilities.size}")
@@ -130,7 +129,6 @@ private fun mkSqlInjectionConfig(cp: JcClasspath): TaintConfiguration {
     cp.findClass("java.sql.ResultSet").declaredMethods
         .filter { it.name.startsWith("get") && it.returnType.isString }
         .forEach { sources[it] = listOf(TaintMethodSource(it, ConstantTrue, AssignMark(Result, SqlInjection))) }
-
 
     val passThrough = mutableMapOf<JcMethod, List<TaintPassThrough>>()
     val sb = cp.findClass("java.lang.StringBuilder")
