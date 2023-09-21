@@ -10,7 +10,6 @@ dependencies {
     implementation(Libs.clikt)
     implementation(Libs.kotlinx_serialization_json)
     implementation(Libs.sarif4k)
-
     implementation(Libs.kotlin_logging)
     implementation(Libs.slf4j_simple)
 }
@@ -22,10 +21,6 @@ application {
 
 tasks.startScripts {
     applicationName = rootProject.name
-}
-
-tasks.test {
-    maxHeapSize = "2G"
 }
 
 // tasks.shadowJar {

@@ -1,6 +1,7 @@
 @file:Suppress("PublicApiImplicitType", "MemberVisibilityCanBePrivate", "unused", "ConstPropertyName")
 
 object Versions {
+    const val annotations = "24.0.1"
     const val clikt = "4.2.0"
     const val dokka = "1.8.20"
     const val gradle_plugin_publish = "1.2.1"
@@ -100,14 +101,21 @@ object Libs {
         version = Versions.sarif4k
     )
 
+    // https://github.com/JetBrains/java-annotations
+    val annotations = dep(
+        group = "org.jetbrains",
+        name = "annotations",
+        version = Versions.annotations
+    )
+
+    // https://github.com/UnitTestBot/ksmt
     val ksmt_core = dep(
-        group ="io.ksmt",
+        group = "io.ksmt",
         name = "ksmt-core",
         version = "0.5.7"
     )
-
     val ksmt_z3 = dep(
-        group ="io.ksmt",
+        group = "io.ksmt",
         name = "ksmt-z3",
         version = "0.5.7"
     )

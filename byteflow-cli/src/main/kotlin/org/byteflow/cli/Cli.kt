@@ -93,8 +93,11 @@ class Cli : CliktCommand("byteflow") {
         logger.info { "start at $timeStart" }
 
         val config = Json.decodeFromString<AnalysisConfig>(configFile.readText())
+        logger.info { "config = $config" }
 
+        logger.info { "classpath = $classpath" }
         val classpathAsFiles = classpath.split(File.pathSeparatorChar).sorted().map { File(it) }
+
         val cp = runBlocking {
             logger.info { "initializing jacodb..." }
             val jacodb = jacodb {

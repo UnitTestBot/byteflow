@@ -19,6 +19,7 @@ package org.byteflow.gradle
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.jacodb.analysis.AnalysisConfig
 
 /**
  * Example configuration:
@@ -26,18 +27,19 @@ import org.gradle.api.provider.Property
  * ```
  * byteflow {
  *     // configFile = layout.projectDirectory.file("configs/config.json")
- *     // dbLocation = "index.db"
- *     startClasses = listOf("org.byteflow.examples.NpeExamples")
  *     classpath = System.getProperty("java.class.path")
+ *     startClasses = listOf("org.byteflow.examples.NpeExamples")
+ *     // dbLocation = "index.db"
  *     // outputFile = File("report.sarif")
  * }
  * ```
  */
 interface ByteFlowExtension {
+    val config: Property<AnalysisConfig>
     val configFile: RegularFileProperty
-    val dbLocation: Property<String>
-    val startClasses: ListProperty<String>
     val classpath: Property<String>
+    val startClasses: ListProperty<String>
+    val dbLocation: Property<String>
     val outputPath: Property<String>
     val useUsvmAnalysis: Property<Boolean>
 

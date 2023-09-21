@@ -1,6 +1,10 @@
+import org.byteflow.gradle.RunAnalyzerTask
+import org.byteflow.gradle.analysisConfig
+import org.byteflow.gradle.getMethodsForClasses
+
 plugins {
-    java
-    id("io.github.UnitTestBot.byteflow") version "c09d96f3c5"
+    `java-library`
+    id("io.github.UnitTestBot.byteflow") version "0.1.0-SNAPSHOT"
     // id("byteflow-gradle") version "..."
 }
 
@@ -22,13 +26,15 @@ dependencies {
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
 }
 
 byteflow {
     configFile = layout.projectDirectory.file("configs/config.json")
     startClasses = listOf(
-        // "com.example.NpeExamples",
+        "com.example.NpeExamples",
         "com.example.SqlInjectionSampleFP",
         "com.example.SqlInjectionSampleTP",
     )
@@ -41,6 +47,57 @@ byteflow {
 tasks.runAnalyzer {
     dependsOn(tasks.compileJava)
 }
+
+// ------------------------------------------------------------------------------------------------
+// Specific analysis tasks.
+//
+
+tasks.register<RunAnalyzerTask>("analyzeNpeExamples") {
+    dependsOn(tasks.compileJava)
+    config = analysisConfig(
+        "NPE" to mapOf(
+            "UnitResolver" to "singleton",
+        ),
+    )
+    dbLocation = "index.db"
+    classpath = sourceSets["main"].runtimeClasspath.asPath
+    methodsForCp = { cp ->
+        getMethodsForClasses(cp, startClasses = listOf("com.example.NpeExamples"))
+    }
+    outputPath = "report-npe.sarif"
+}
+
+tasks.register<RunAnalyzerTask>("analyzeSqlInjectionSampleFP") {
+    dependsOn(tasks.compileJava)
+    config = analysisConfig(
+        "SQL" to mapOf(
+            "UnitResolver" to "singleton",
+        ),
+    )
+    dbLocation = "index.db"
+    classpath = sourceSets["main"].runtimeClasspath.asPath
+    methodsForCp = { cp ->
+        getMethodsForClasses(cp, startClasses = listOf("com.example.SqlInjectionSampleFP"))
+    }
+    outputPath = "report-sql-fp.sarif"
+}
+
+tasks.register<RunAnalyzerTask>("analyzeSqlInjectionSampleTP") {
+    dependsOn(tasks.compileJava)
+    config = analysisConfig(
+        "SQL" to mapOf(
+            "UnitResolver" to "singleton",
+        ),
+    )
+    dbLocation = "index.db"
+    classpath = sourceSets["main"].runtimeClasspath.asPath
+    methodsForCp = { cp ->
+        getMethodsForClasses(cp, startClasses = listOf("com.example.SqlInjectionSampleTP"))
+    }
+    outputPath = "report-sql-tp.sarif"
+}
+
+// ------------------------------------------------------------------------------------------------
 
 // Debug task
 tasks.register("yeet") {

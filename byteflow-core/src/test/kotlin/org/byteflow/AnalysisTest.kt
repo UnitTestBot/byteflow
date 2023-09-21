@@ -18,9 +18,12 @@ package org.byteflow
 
 import kotlinx.coroutines.runBlocking
 import org.byteflow.examples.NpeExamples
-import org.byteflow.examples.SqlInjectionSample
-import org.byteflow.examples.SqlInjectionSample2
 import org.jacodb.analysis.graph.newApplicationGraphForAnalysis
+import org.jacodb.api.JcClassOrInterface
+import org.jacodb.api.JcClassProcessingTask
+import org.jacodb.impl.jacodb
+import org.byteflow.examples.SqlInjectionSampleFP
+import org.byteflow.examples.SqlInjectionSampleTP
 import org.jacodb.api.ext.findClass
 import org.jacodb.approximation.Approximations
 import org.jacodb.impl.features.InMemoryHierarchy
@@ -32,20 +35,60 @@ import kotlin.test.assertEquals
 
 class AnalysisTest {
     @Test
-    fun `test basic analysis of NpeExamples`() {
-        val vulnerabilities = runAnalysis<NpeExamples>("NPE", useUsvm = false)
-        println(vulnerabilities.size)
+    fun `test NPE analysis of NpeExamples`() {
+        val classpath = System.getProperty("java.class.path")
+        val classpathAsFiles = classpath.split(File.pathSeparatorChar).sorted().map { File(it) }
+        println("classpath = $classpathAsFiles")
+
+        val cp = runBlocking {
+            val db = jacodb {
+                loadByteCode(classpathAsFiles)
+                installFeatures(InMemoryHierarchy, Usages)
+            }
+            db.classpath(classpathAsFiles)
+        }
+
+        val startClasses = listOf(NpeExamples::class.java.name)
+        val startJcClasses = ConcurrentHashMap.newKeySet<JcClassOrInterface>()
+        runBlocking {
+            cp.execute(object : JcClassProcessingTask {
+                override fun process(clazz: JcClassOrInterface) {
+                    if (startClasses.contains(clazz.name)) {
+                        startJcClasses.add(clazz)
+                    }
+                }
+            })
+        }
+        println("startJcClasses: (${startJcClasses.size})")
+        for (clazz in startJcClasses) {
+            println("  - $clazz")
+        }
+
+        val startJcMethods = startJcClasses
+            .flatMap { it.declaredMethods }
+            .filter { !it.isPrivate }
+            .distinct()
+        println("startJcMethods: (${startJcMethods.size})")
+        for (method in startJcMethods) {
+            println("  - $method")
+        }
+
+        val graph = runBlocking {
+            cp.newApplicationGraphForAnalysis()
+        }
+
+        runAnalysis("NPE", mapOf("UnitResolver" to "singleton"), graph, startJcMethods)
     }
 
     @Test
     fun `test sql injection FP`() {
-        val vulnerabilities = runAnalysis<SqlInjectionSample>("SQL", useUsvm = true)
+        val vulnerabilities = runAnalysis<SqlInjectionSampleFP>("SQL", useUsvm = true)
         assertEquals(0, vulnerabilities.size)
     }
 
     @Test
     fun `test sql injection TP`() {
-        val vulnerabilities = runAnalysis<SqlInjectionSample2>("SQL", useUsvm = true)
+        val vulnerabilities = runAnalysis<SqlInjectionSampleTP>("SQL", useUsvm = true)
         assertEquals(1, vulnerabilities.size)
     }
 

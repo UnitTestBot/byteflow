@@ -20,8 +20,8 @@ dependencies {
     api(Libs.jacodb_analysis)
     api(Libs.jacodb_approximations)
 
-    implementation(Libs.kotlinx_coroutines_core)
     implementation(kotlin("reflect"))
+    implementation(Libs.kotlinx_coroutines_core)
 
     implementation(Libs.kotlin_logging)
 
@@ -32,6 +32,10 @@ dependencies {
     `usvm-approximations`("com.github.UnitTestBot.java-stdlib-approximations:approximations:c992f31c14")
 
     testImplementation(examples.output)
+}
+
+tasks.test {
+    maxHeapSize = "2G"
 }
 
 tasks.withType<ProcessResources> {
