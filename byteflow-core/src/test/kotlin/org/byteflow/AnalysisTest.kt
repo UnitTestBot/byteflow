@@ -50,12 +50,14 @@ class AnalysisTest {
         val classpath = System.getProperty("java.class.path")
         val classpathAsFiles = classpath.split(File.pathSeparatorChar).map { File(it) }
 
+        val approximationsCp = resolveApproximationsClassPath(File("."))
+
         val db = jacodb {
             useProcessJavaRuntime()
             installFeatures(InMemoryHierarchy, Usages, Approximations)
+            loadByteCode(classpathAsFiles + approximationsCp)
         }
 
-        val approximationsCp = resolveApproximationsClassPath(File("."))
         val cp = db.classpath(classpathAsFiles + approximationsCp, listOf(Approximations, UnknownClasses))
 
         val clazz = cp.findClass<T>()
