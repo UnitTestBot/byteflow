@@ -24,6 +24,7 @@ import org.jacodb.api.ext.findClass
 import org.jacodb.approximation.Approximations
 import org.jacodb.impl.features.InMemoryHierarchy
 import org.jacodb.impl.features.Usages
+import org.jacodb.impl.features.classpaths.UnknownClasses
 import org.jacodb.impl.jacodb
 import org.junit.jupiter.api.Tag
 import java.io.File
@@ -55,7 +56,7 @@ class AnalysisTest {
         }
 
         val approximationsCp = resolveApproximationsClassPath(File("."))
-        val cp = db.classpath(classpathAsFiles + approximationsCp, listOf(Approximations))
+        val cp = db.classpath(classpathAsFiles + approximationsCp, listOf(Approximations, UnknownClasses))
 
         val clazz = cp.findClass<T>()
 
