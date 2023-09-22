@@ -71,6 +71,13 @@ class AnalysisTest {
             cp.newApplicationGraphForAnalysis()
         }
 
-        runAnalysis(analysis, mapOf("UnitResolver" to "singleton"), graph, startJcMethods, useUsvmAnalysis = useUsvm)
+        runAnalysis(
+            analysis,
+            mapOf("UnitResolver" to "singleton"),
+            graph,
+            startJcMethods,
+            useUsvmAnalysis = useUsvm,
+            usvmOptions = DefaultUsvmOptions.toUMachineOptions()
+        )
     }
 }

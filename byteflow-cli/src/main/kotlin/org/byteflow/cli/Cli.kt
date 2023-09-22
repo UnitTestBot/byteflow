@@ -32,6 +32,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToStream
 import org.byteflow.AnalysesOptions
 import org.byteflow.AnalysisType
+import org.byteflow.DefaultUsvmOptions
 import org.byteflow.resolveApproximationsClassPath
 import org.byteflow.runAnalysis
 import org.jacodb.analysis.graph.newApplicationGraphForAnalysis
@@ -152,7 +153,9 @@ class Cli : CliktCommand("byteflow") {
         logger.info { "Analyzing..." }
         val vulnerabilities = config.analyses
             .mapNotNull { (analysis, options) ->
-                runAnalysis(analysis, options, graph, startJcMethods)
+                // TODO read options from cli
+                // TODO configure useUsvmAnalysis
+                runAnalysis(analysis, options, graph, startJcMethods, useUsvmAnalysis = false, DefaultUsvmOptions.toUMachineOptions())
             }
             .flatten()
         logger.info { "Analysis done. Found ${vulnerabilities.size} vulnerabilities" }
