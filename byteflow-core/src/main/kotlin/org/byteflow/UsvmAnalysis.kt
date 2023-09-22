@@ -7,8 +7,11 @@ import org.jacodb.api.TypeName
 import org.jacodb.api.analysis.JcApplicationGraph
 import org.jacodb.api.ext.cfg.callExpr
 import org.jacodb.api.ext.findClass
+import org.usvm.CoverageZone
 import org.usvm.PathSelectionStrategy
+import org.usvm.PathSelectorCombinationStrategy
 import org.usvm.SolverType
+import org.usvm.StateCollectionStrategy
 import org.usvm.UMachineOptions
 import org.usvm.api.targets.Argument
 import org.usvm.api.targets.AssignMark
@@ -28,17 +31,18 @@ import org.usvm.api.targets.TaintPassThrough
 import org.usvm.api.targets.ThisArgument
 import org.usvm.machine.JcMachine
 import org.usvm.targets.UTargetController
+import kotlin.time.Duration.Companion.minutes
 
 fun analyzeVulnerabilitiesWithUsvm(
     analysis: AnalysisType,
     options: AnalysesOptions,
     graph: JcApplicationGraph,
     methods: List<JcMethod>,
-    timeoutMillis: Long,
     vulnerabilities: List<VulnerabilityInstance>,
+    usvmOptions: UMachineOptions,
 ): List<VulnerabilityInstance> = when (analysis) {
     "SQL" -> {
-        analyzeSqlVulnerabilitiesWithUsvm(graph, methods, timeoutMillis, vulnerabilities)
+        analyzeSqlVulnerabilitiesWithUsvm(graph, methods, vulnerabilities, usvmOptions)
     }
 
     else -> {
@@ -49,10 +53,11 @@ fun analyzeVulnerabilitiesWithUsvm(
 private fun analyzeSqlVulnerabilitiesWithUsvm(
     graph: JcApplicationGraph,
     methods: List<JcMethod>,
-    timeoutMillis: Long,
     vulnerabilities: List<VulnerabilityInstance>,
+    usvmOptions: UMachineOptions,
 ): List<VulnerabilityInstance> {
     System.err.println("RUN USVM ANALYSIS")
+    System.err.println("USVM OPTIONS: $usvmOptions")
     System.err.println("Vulnerabilities before: ${vulnerabilities.size}")
 
     val config = mkSqlInjectionConfig(graph.classpath)
@@ -82,15 +87,9 @@ private fun analyzeSqlVulnerabilitiesWithUsvm(
         }
     }
 
-    val options = UMachineOptions(
-        pathSelectionStrategies = listOf(PathSelectionStrategy.TARGETED),
-        timeoutMs = timeoutMillis,
-        stopOnTargetsReached = true,
-        solverType = SolverType.Z3
-    )
     val analysis = TaintAnalysis(config, initialTargets)
 
-    JcMachine(graph.classpath, options, analysis).use { machine ->
+    JcMachine(graph.classpath, usvmOptions, analysis).use { machine ->
         methods.forEach { machine.analyze(it, initialTargets as List<JcTarget<UTargetController>>) }
     }
 
@@ -183,6 +182,58 @@ private fun mkSqlInjectionConfig(cp: JcClasspath): TaintConfiguration {
         cleaners = emptyMap(),
         methodSinks = sinks,
         fieldSinks = emptyMap()
+    )
+}
+
+object DefaultUsvmOptions {
+    // TODO choose a proper value
+    const val collectedStatesLimit: Int = Int.MAX_VALUE
+
+    val coverageZone: CoverageZone = CoverageZone.METHOD
+
+    const val exceptionsPropagation: Boolean = true
+
+    val pathSelectionStrategies: Array<PathSelectionStrategy> = arrayOf(PathSelectionStrategy.TARGETED)
+
+    val pathSelectorCombinationStrategy: PathSelectorCombinationStrategy = PathSelectorCombinationStrategy.INTERLEAVED
+
+    const val randomSeed: Long = 0
+
+    val solverType: SolverType = SolverType.Z3
+
+    val stateCollectionStrategy: StateCollectionStrategy = StateCollectionStrategy.COVERED_NEW
+
+    // TODO stolen from the loop tests
+    val stepLimit: ULong = 100_000UL
+
+    // TODO stolen from the test runner
+    const val stepsFromLastCovered: Long = 3500L
+
+    const val stopOnCoverage: Int = 100
+
+    const val stopOnTargetsReached: Boolean = true
+
+    // TODO as used in usvm
+    val targetSearchDepth: UInt = 0u
+
+    // TODO choose a proper value
+    val timeoutMs: Long = 5.minutes.inWholeMilliseconds
+
+    fun toUMachineOptions(): UMachineOptions = UMachineOptions(
+        collectedStatesLimit = collectedStatesLimit,
+        coverageZone = coverageZone,
+        exceptionsPropagation = exceptionsPropagation,
+        pathSelectionStrategies = pathSelectionStrategies.toList(),
+        pathSelectorCombinationStrategy = pathSelectorCombinationStrategy,
+        randomSeed = randomSeed,
+        solverType = solverType,
+        stateCollectionStrategy = stateCollectionStrategy,
+        stepLimit = stepLimit,
+        stepsFromLastCovered = stepsFromLastCovered,
+        stopOnCoverage = stopOnCoverage,
+        stopOnTargetsReached = stopOnTargetsReached,
+        targetSearchDepth = targetSearchDepth,
+        timeoutMs = timeoutMs,
     )
 }
 

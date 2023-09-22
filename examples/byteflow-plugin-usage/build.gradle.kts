@@ -40,7 +40,6 @@ byteflow {
     )
     classpath = sourceSets["main"].runtimeClasspath.asPath
     dbLocation = "index.db"
-    useUsvmAnalysis = project.findProperty("useUsvmAnalysis")?.toString()?.toBoolean() ?: false
 }
 
 tasks.runAnalyzer {
@@ -79,7 +78,6 @@ tasks.register<RunAnalyzerTask>("analyzeSqlInjectionSampleFP") {
         getMethodsForClasses(cp, startClasses = listOf("com.example.SqlInjectionSampleFP"))
     }
     outputPath = "report-sql-fp.sarif"
-    useUsvmAnalysis = project.findProperty("useUsvmAnalysis")?.toString()?.toBoolean() ?: false
 }
 
 tasks.register<RunAnalyzerTask>("analyzeSqlInjectionSampleTP") {
@@ -95,7 +93,6 @@ tasks.register<RunAnalyzerTask>("analyzeSqlInjectionSampleTP") {
         getMethodsForClasses(cp, startClasses = listOf("com.example.SqlInjectionSampleTP"))
     }
     outputPath = "report-sql-tp.sarif"
-    useUsvmAnalysis = project.findProperty("useUsvmAnalysis")?.toString()?.toBoolean() ?: false
 }
 
 // ------------------------------------------------------------------------------------------------

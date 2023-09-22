@@ -22,6 +22,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToStream
+import org.byteflow.DefaultUsvmOptions
 import org.byteflow.resolveApproximationsClassPath
 import org.byteflow.runAnalysis
 import org.gradle.api.DefaultTask
@@ -43,6 +44,12 @@ import org.jacodb.approximation.Approximations
 import org.jacodb.impl.features.InMemoryHierarchy
 import org.jacodb.impl.features.Usages
 import org.jacodb.impl.jacodb
+import org.usvm.CoverageZone
+import org.usvm.PathSelectionStrategy
+import org.usvm.PathSelectorCombinationStrategy
+import org.usvm.SolverType
+import org.usvm.StateCollectionStrategy
+import org.usvm.UMachineOptions
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.DurationUnit
@@ -79,12 +86,145 @@ abstract class RunAnalyzerTask : DefaultTask() {
     @get:Input
     abstract val useUsvmAnalysis: Property<Boolean>
 
+    @get:Optional
+    @get:Input
+    abstract val collectedStatesLimit: Property<Int>
+
+    @get:Optional
+    @get:Input
+    abstract val coverageZone: Property<CoverageZone>
+
+    @get:Optional
+    @get:Input
+    abstract val exceptionsPropagation: Property<Boolean>
+
+    @get:Optional
+    @get:Input
+    abstract val pathSelectionStrategies: Property<Array<PathSelectionStrategy>>
+
+    @get:Optional
+    @get:Input
+    abstract val pathSelectorCombinationStrategy: Property<PathSelectorCombinationStrategy>
+
+    @get:Optional
+    @get:Input
+    abstract val randomSeed: Property<Long>
+
+    @get:Optional
+    @get:Input
+    abstract val solverType: Property<SolverType>
+
+    @get:Optional
+    @get:Input
+    abstract val stateCollectionStrategy: Property<StateCollectionStrategy>
+
+    @get:Optional
+    @get:Input
+    abstract val stepLimit: Property<ULong>
+
+    @get:Optional
+    @get:Input
+    abstract val stepsFromLastCovered: Property<Long>
+
+    @get:Optional
+    @get:Input
+    abstract val stopOnCoverage: Property<Int>
+
+    @get:Optional
+    @get:Input
+    abstract val stopOnTargetsReached: Property<Boolean>
+
+    @get:Optional
+    @get:Input
+    abstract val targetSearchDepth: Property<UInt>
+
+    @get:Optional
+    @get:Input
+    abstract val timeoutMs: Property<Long>
+
     @get:Input
     abstract val deduplicateThreadFlowLocations: Property<Boolean>
 
     init {
-        useUsvmAnalysis.convention(false)
         deduplicateThreadFlowLocations.convention(true)
+
+
+        // TODO copy-paste stuff, didn't found any other way - perhaps use json reader?
+        project.findProperty("useUsvmAnalysis")?.let {
+            useUsvmAnalysis.value(it.toString().toBooleanStrictOrNull())
+        }
+        project.findProperty("collectedStatesLimit")?.let {
+            collectedStatesLimit.value(it.toString().toIntOrNull())
+        }
+        project.findProperty("coverageZone")?.let { zone ->
+            coverageZone.value(CoverageZone.values().singleOrNull { it.name == zone })
+        }
+        project.findProperty("exceptionsPropagation")?.let {
+            exceptionsPropagation.value(it.toString().toBooleanStrictOrNull())
+        }
+        // TODO
+        project.findProperty("pathSelectionStrategies")?.let { strategies ->
+            strategies
+                .toString()
+                .replace("[", "")
+                .replace("]", "")
+                .replace(" ", "")
+                .split(",")
+                .mapNotNull { strategy ->
+                    PathSelectionStrategy.values().singleOrNull { it.name == strategy }
+                }.takeIf { it.isNotEmpty()}
+                .let {
+                    pathSelectionStrategies.value(it?.toTypedArray())
+                }
+        }
+        project.findProperty("pathSelectorCombinationStrategy")?.let { strategy ->
+            pathSelectorCombinationStrategy.value(PathSelectorCombinationStrategy.values().singleOrNull { it.name == strategy })
+        }
+        project.findProperty("randomSeed")?.let {
+            randomSeed.value(it.toString().toLongOrNull())
+        }
+        project.findProperty("solverType")?.let { solver ->
+            solverType.value(SolverType.values().singleOrNull { it.name == solver })
+        }
+        project.findProperty("stateCollectionStrategy")?.let { scs ->
+            stateCollectionStrategy.value(StateCollectionStrategy.values().singleOrNull { it.name == scs })
+        }
+        project.findProperty("stepLimit")?.let {
+            stepLimit.value(it.toString().toULongOrNull())
+        }
+        project.findProperty("stepsFromLastCovered")?.let {
+            stepsFromLastCovered.value(it.toString().toLongOrNull())
+        }
+        project.findProperty("stopOnCoverage")?.let {
+            stopOnCoverage.value(it.toString().toIntOrNull())
+        }
+        project.findProperty("stopOnTargetsReached")?.let {
+            stopOnTargetsReached.value(it.toString().toBooleanStrictOrNull())
+        }
+        project.findProperty("targetSearchDepth")?.let {
+            targetSearchDepth.value(it.toString().toUIntOrNull())
+        }
+        project.findProperty("timeoutMs")?.let {
+            timeoutMs.value(it.toString().toLongOrNull())
+        }
+
+
+
+        useUsvmAnalysis.convention(false)
+        collectedStatesLimit.convention(DefaultUsvmOptions.collectedStatesLimit)
+        coverageZone.convention(DefaultUsvmOptions.coverageZone)
+        exceptionsPropagation.convention(DefaultUsvmOptions.exceptionsPropagation)
+        pathSelectionStrategies.convention(DefaultUsvmOptions.pathSelectionStrategies)
+        pathSelectorCombinationStrategy.convention(DefaultUsvmOptions.pathSelectorCombinationStrategy)
+        randomSeed.convention(DefaultUsvmOptions.randomSeed)
+        solverType.convention(DefaultUsvmOptions.solverType)
+        stateCollectionStrategy.convention(DefaultUsvmOptions.stateCollectionStrategy)
+        stepLimit.convention(DefaultUsvmOptions.stepLimit)
+        stepsFromLastCovered.convention(DefaultUsvmOptions.stepsFromLastCovered)
+        stopOnCoverage.convention(DefaultUsvmOptions.stopOnCoverage)
+        stopOnTargetsReached.convention(DefaultUsvmOptions.stopOnTargetsReached)
+        targetSearchDepth.convention(DefaultUsvmOptions.targetSearchDepth)
+        timeoutMs.convention(DefaultUsvmOptions.timeoutMs)
     }
 
     @TaskAction
@@ -138,10 +278,27 @@ abstract class RunAnalyzerTask : DefaultTask() {
         logger.quiet("Analyzing...")
         val timeStartAnalysis = TimeSource.Monotonic.markNow()
         val useUsvm = useUsvmAnalysis.get()
+        val usvmOptions = UMachineOptions(
+            collectedStatesLimit = collectedStatesLimit.get(),
+            coverageZone = coverageZone.get(),
+            exceptionsPropagation = exceptionsPropagation.get(),
+            pathSelectionStrategies = pathSelectionStrategies.get().toList(),
+            pathSelectorCombinationStrategy = pathSelectorCombinationStrategy.get(),
+            randomSeed = randomSeed.get(),
+            solverType = solverType.get(),
+            stateCollectionStrategy = stateCollectionStrategy.get(),
+            stepLimit = stepLimit.get(),
+            stepsFromLastCovered = stepsFromLastCovered.get(),
+            stopOnCoverage = stopOnCoverage.get(),
+            stopOnTargetsReached = stopOnTargetsReached.get(),
+            targetSearchDepth = targetSearchDepth.get(),
+            timeoutMs = timeoutMs.get(),
+        )
+
         val vulnerabilities = config.analyses
             .flatMap { (analysis, options) ->
                 logger.quiet("running '$analysis' analysis...")
-                runAnalysis(analysis, options, graph, methods, useUsvmAnalysis = useUsvm)
+                runAnalysis(analysis, options, graph, methods, useUsvmAnalysis = useUsvm, usvmOptions)
             }
         logger.quiet("Analysis done in ${timeStartAnalysis.elapsedNow()}")
         logger.quiet("Found ${vulnerabilities.size} vulnerabilities")

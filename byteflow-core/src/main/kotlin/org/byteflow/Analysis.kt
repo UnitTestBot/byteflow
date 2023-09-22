@@ -25,6 +25,7 @@ import org.jacodb.analysis.library.newNpeRunnerFactory
 import org.jacodb.analysis.library.newSqlInjectionRunnerFactory
 import org.jacodb.api.JcMethod
 import org.jacodb.api.analysis.JcApplicationGraph
+import org.usvm.UMachineOptions
 import java.io.File
 
 private val logger = KotlinLogging.logger {}
@@ -37,8 +38,8 @@ fun runAnalysis(
     options: AnalysesOptions,
     graph: JcApplicationGraph,
     methods: List<JcMethod>,
-    timeoutMillis: Long = Long.MAX_VALUE,
     useUsvmAnalysis: Boolean = false,
+    usvmOptions: UMachineOptions,
 ): List<VulnerabilityInstance> {
     logger.info { "Launching analysis: '$analysis'" }
     val runner = when (analysis) {
@@ -61,14 +62,14 @@ fun runAnalysis(
     val unitResolverName = options.getOrDefault("UnitResolver", "method")
     logger.info { "Using unit resolver: '$unitResolverName'" }
     val unitResolver = UnitResolver.getByName(unitResolverName)
-    val manager = MainIfdsUnitManager(graph, unitResolver, runner, methods, timeoutMillis)
+    val manager = MainIfdsUnitManager(graph, unitResolver, runner, methods, usvmOptions.timeoutMs ?: DefaultUsvmOptions.timeoutMs)
 
     val vulnerabilities = manager.analyze()
     if (!useUsvmAnalysis) {
         return vulnerabilities
     }
 
-    return analyzeVulnerabilitiesWithUsvm(analysis, options, graph, methods, timeoutMillis, vulnerabilities)
+    return analyzeVulnerabilitiesWithUsvm(analysis, options, graph, methods, vulnerabilities, usvmOptions)
 }
 
 fun resolveApproximationsClassPath(unpackDir: File) = listOf(

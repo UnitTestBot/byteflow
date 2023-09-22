@@ -28,7 +28,7 @@ dependencies {
     implementation(Libs.ksmt_core)
     implementation(Libs.ksmt_z3)
 
-    implementation(files(usvmJar))
+    api(files(usvmJar))
     `usvm-approximations`("com.github.UnitTestBot.java-stdlib-approximations:approximations:c992f31c14")
 
     testImplementation(examples.output)

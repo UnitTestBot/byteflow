@@ -62,7 +62,15 @@ class NpeExamplesTest {
         val options = mapOf(
             "UnitResolver" to "singleton"
         )
-        val vulnerabilities = runAnalysis("NPE", options, graph, startJcMethods)
+        // TODO configure options
+        val vulnerabilities = runAnalysis(
+            "NPE",
+            options,
+            graph,
+            startJcMethods,
+            useUsvmAnalysis = false,
+            usvmOptions = DefaultUsvmOptions.toUMachineOptions()
+        )
         assertTrue(vulnerabilities.isNotEmpty())
     }
 }
