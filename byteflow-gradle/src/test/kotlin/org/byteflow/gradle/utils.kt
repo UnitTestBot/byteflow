@@ -17,8 +17,6 @@
 package org.byteflow.gradle
 
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.api.tasks.SourceSet
 import org.gradle.testfixtures.ProjectBuilder
 
 internal const val BYTEFLOW_GRADLE_PLUGIN = "io.github.UnitTestBot.byteflow"
@@ -32,9 +30,3 @@ internal fun buildProject(): Project {
 
 internal val Project.byteflowPlugin: ByteFlowPlugin
     get() = this.plugins.getPlugin(ByteFlowPlugin::class.java)
-
-internal val Project.javaPlugin: JavaPluginExtension
-    get() = this.extensions.getByType(JavaPluginExtension::class.java)
-
-internal val Project.mainSourceSet: SourceSet
-    get() = this.javaPlugin.sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME)

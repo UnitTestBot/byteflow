@@ -30,24 +30,22 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToStream
-import org.byteflow.AnalysesOptions
+import org.byteflow.AnalysisOptions
 import org.byteflow.AnalysisType
+import org.byteflow.getClassesNameEq
 import org.byteflow.runAnalysis
 import org.jacodb.analysis.graph.newApplicationGraphForAnalysis
 import org.jacodb.analysis.sarif.sarifReportFromVulnerabilities
-import org.jacodb.api.JcClassOrInterface
-import org.jacodb.api.JcClassProcessingTask
 import org.jacodb.impl.features.InMemoryHierarchy
 import org.jacodb.impl.features.Usages
 import org.jacodb.impl.jacodb
 import java.io.File
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.TimeSource
 
 private val logger = KotlinLogging.logger {}
 
 @Serializable
-data class AnalysisConfig(val analyses: Map<AnalysisType, AnalysesOptions>)
+data class AnalysisConfig(val analyses: Map<AnalysisType, AnalysisOptions>)
 
 @Suppress("MemberVisibilityCanBePrivate")
 class Cli : CliktCommand("byteflow") {
@@ -97,8 +95,8 @@ class Cli : CliktCommand("byteflow") {
         val classpathAsFiles = classpath.split(File.pathSeparatorChar).sorted().map { File(it) }
 
         val cp = runBlocking {
-            logger.info { "initializing jacodb..." }
-            val jacodb = jacodb {
+            logger.info { "initializing db..." }
+            val db = jacodb {
                 dbLocation?.let {
                     logger.info { "Using db location: '$it'" }
                     persistent(it)
@@ -106,56 +104,49 @@ class Cli : CliktCommand("byteflow") {
                 loadByteCode(classpathAsFiles)
                 installFeatures(InMemoryHierarchy, Usages)
             }
-            logger.info { "jacodb created, creating cp..." }
-            jacodb.classpath(classpathAsFiles)
+            logger.info { "db created, creating cp..." }
+            db.classpath(classpathAsFiles)
         }
         logger.info { "cp created" }
 
         val startClassesAsList = startClasses.split(",")
-        echo("startClasses: (${startClassesAsList.size})")
+        logger.info { "startClasses: (${startClassesAsList.size})" }
         for (clazz in startClassesAsList) {
-            echo("  - $clazz")
+            logger.info { "  - $clazz" }
         }
 
-        logger.info { "process classes" }
-        val startJcClasses = ConcurrentHashMap.newKeySet<JcClassOrInterface>()
-        cp.executeAsync(object : JcClassProcessingTask {
-            override fun process(clazz: JcClassOrInterface) {
-                if (startClassesAsList.any { clazz.name.startsWith(it) }) {
-                    startJcClasses.add(clazz)
-                }
-            }
-        }).get()
-        echo("startJcClasses: (${startJcClasses.size})")
+        logger.info { "Searching classes..." }
+        val startJcClasses = getClassesNameEq(cp, startClassesAsList)
+        logger.info { "startClasses: (${startJcClasses.size})" }
         for (clazz in startJcClasses) {
-            echo("  - $clazz")
+            logger.info { "  - $clazz" }
         }
-        logger.info { "filter start methods" }
+
+        logger.info { "Filtering methods..." }
         val startJcMethods = startJcClasses
             .flatMap { it.declaredMethods }
             .filter { !it.isPrivate }
-            // .filterNot { it.enclosingClass.name == "java.lang.Object" }
             .distinct()
-        echo("startJcMethods: (${startJcMethods.size})")
+
+        logger.info { "startMethods: (${startJcMethods.size})" }
         for (method in startJcMethods) {
-            echo("  - $method")
+            logger.info { "  - $method" }
         }
 
-        logger.info { "create application graph" }
+        logger.info { "Creating application graph..." }
         val graph = runBlocking {
             cp.newApplicationGraphForAnalysis()
         }
 
         logger.info { "Analyzing..." }
         val vulnerabilities = config.analyses
-            .mapNotNull { (analysis, options) ->
+            .flatMap { (analysis, options) ->
                 runAnalysis(analysis, options, graph, startJcMethods)
             }
-            .flatten()
         logger.info { "Analysis done. Found ${vulnerabilities.size} vulnerabilities" }
-        // for (vulnerability in vulnerabilities) {
-        //     echo(vulnerability)
-        // }
+        for (vulnerability in vulnerabilities) {
+            logger.info { vulnerability }
+        }
 
         if (outputPath != "") {
             val sarif = sarifReportFromVulnerabilities(vulnerabilities)

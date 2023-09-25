@@ -1,6 +1,6 @@
+import org.byteflow.analysisConfig
+import org.byteflow.getPublicMethodsForClasses
 import org.byteflow.gradle.RunAnalyzerTask
-import org.byteflow.gradle.analysisConfig
-import org.byteflow.gradle.getMethodsForClasses
 
 plugins {
     `java-library`
@@ -60,7 +60,7 @@ tasks.register<RunAnalyzerTask>("analyzeNpeExamples") {
     dbLocation = "index.db"
     classpath = sourceSets["main"].runtimeClasspath.asPath
     methodsForCp = { cp ->
-        getMethodsForClasses(cp, startClasses = listOf("com.example.NpeExamples"))
+        getPublicMethodsForClasses(cp, listOf("com.example.NpeExamples"))
     }
     outputPath = "report-npe.sarif"
 }
@@ -75,7 +75,7 @@ tasks.register<RunAnalyzerTask>("analyzeSqlInjectionSampleFP") {
     dbLocation = "index.db"
     classpath = sourceSets["main"].runtimeClasspath.asPath
     methodsForCp = { cp ->
-        getMethodsForClasses(cp, startClasses = listOf("com.example.SqlInjectionSampleFP"))
+        getPublicMethodsForClasses(cp, listOf("com.example.SqlInjectionSampleFP"))
     }
     outputPath = "report-sql-fp.sarif"
 }
@@ -90,7 +90,7 @@ tasks.register<RunAnalyzerTask>("analyzeSqlInjectionSampleTP") {
     dbLocation = "index.db"
     classpath = sourceSets["main"].runtimeClasspath.asPath
     methodsForCp = { cp ->
-        getMethodsForClasses(cp, startClasses = listOf("com.example.SqlInjectionSampleTP"))
+        getPublicMethodsForClasses(cp, listOf("com.example.SqlInjectionSampleTP"))
     }
     outputPath = "report-sql-tp.sarif"
 }

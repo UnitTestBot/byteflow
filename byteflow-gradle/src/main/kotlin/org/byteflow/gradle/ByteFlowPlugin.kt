@@ -16,6 +16,8 @@
 
 package org.byteflow.gradle
 
+import org.byteflow.analysisConfigFromFile
+import org.byteflow.getPublicMethodsForClasses
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.create
@@ -23,28 +25,31 @@ import org.gradle.kotlin.dsl.register
 
 class ByteFlowPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        project.logger.quiet("Applying ByteFlow plugin")
+        project.logger.lifecycle("Applying ByteFlow plugin")
 
         // Example 'hello' task
         project.tasks.register("hello") {
-            logger.quiet("Registering '$name' task")
+            logger.lifecycle("Registering '$name' task")
             doLast {
                 println("Hello!")
             }
         }
 
-        // 'byteflow {}' extension
-        val extension = project.extensions.create<ByteFlowExtension>(ByteFlowExtension.NAME)
+        // 'byteflow {...}' extension
+        val extension = project.extensions.create<ByteFlowExtension>(EXTENSION_NAME)
         extension.apply {
-            // Defaults:
+            // Extension defaults:
             configFile.convention(project.layout.projectDirectory.file("configs/config.json"))
             outputPath.convention("report.sarif")
         }
 
         // 'runAnalyzer' task
-        project.tasks.register<RunAnalyzerTask>(RunAnalyzerTask.NAME) {
-            logger.quiet("Registering '$name' task")
-            // Mapping:
+        project.tasks.register<RunAnalyzerTask>(TASK_NAME) {
+            logger.lifecycle("Registering '$name' task")
+
+            // Note: task defaults are configured in the task's `init {...}` block.
+
+            // Mapping of options from the extension:
             config.convention(project.provider {
                 if (extension.config.isPresent) {
                     // TODO: throw GradleException if 'configFile' is present.
@@ -55,10 +60,16 @@ class ByteFlowPlugin : Plugin<Project> {
             })
             dbLocation.convention(extension.dbLocation)
             methodsForCp.convention { cp ->
-                project.getMethodsForClasses(cp, extension.startClasses.get())
+                // Default behavior is to extract all public methods from the given classes:
+                getPublicMethodsForClasses(cp, extension.startClasses.get())
             }
             classpath.convention(extension.classpath)
             outputPath.convention(extension.outputPath)
         }
+    }
+
+    companion object {
+        const val TASK_NAME: String = "runAnalyzer"
+        const val EXTENSION_NAME: String = "byteflow"
     }
 }

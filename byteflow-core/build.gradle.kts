@@ -7,6 +7,7 @@ dependencies {
     api(Libs.jacodb_core)
     api(Libs.jacodb_analysis)
     implementation(Libs.kotlinx_coroutines_core)
+    implementation(Libs.kotlinx_serialization_json)
     implementation(Libs.kotlin_logging)
 }
 

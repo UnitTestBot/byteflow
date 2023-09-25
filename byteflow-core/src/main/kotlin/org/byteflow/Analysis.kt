@@ -29,11 +29,11 @@ import org.jacodb.api.analysis.JcApplicationGraph
 private val logger = KotlinLogging.logger {}
 
 typealias AnalysisType = String
-typealias AnalysesOptions = Map<String, String>
+typealias AnalysisOptions = Map<String, String>
 
 fun runAnalysis(
     analysis: AnalysisType,
-    options: AnalysesOptions,
+    options: AnalysisOptions,
     graph: JcApplicationGraph,
     methods: List<JcMethod>,
     timeoutMillis: Long = Long.MAX_VALUE,

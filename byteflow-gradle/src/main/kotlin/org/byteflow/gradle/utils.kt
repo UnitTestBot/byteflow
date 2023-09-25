@@ -16,21 +16,57 @@
 
 package org.byteflow.gradle
 
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromStream
-import org.byteflow.AnalysesOptions
-import org.byteflow.AnalysisType
-import org.jacodb.analysis.AnalysisConfig
+import io.github.detekt.sarif4k.SarifSchema210
+import io.github.detekt.sarif4k.ThreadFlowLocation
+import org.jacodb.api.cfg.JcInst
 import java.io.File
 
-fun analysisConfig(vararg pairs: Pair<AnalysisType, AnalysesOptions>): AnalysisConfig {
-    return AnalysisConfig(pairs.toMap())
+val defaultResolver: (JcInst) -> String = { inst ->
+    val registeredLocation = inst.location.method.declaration.location
+    val classFileBaseName = inst.location.method.enclosingClass.name.replace('.', '/')
+    if (registeredLocation.path.contains("build/classes/")) {
+        val src = registeredLocation.path.replace("build/classes/(\\w+)/(\\w+)".toRegex()) {
+            val (language, sourceSet) = it.destructured
+            "src/${sourceSet}/${language}"
+        }
+        "file://" + File(src).resolve(classFileBaseName.substringBefore('$')).path + ".java"
+    } else {
+        File(registeredLocation.path).resolve(classFileBaseName).path + ".class"
+    }
 }
 
-@OptIn(ExperimentalSerializationApi::class)
-fun analysisConfigFromFile(path: String): AnalysisConfig {
-    return File(path).inputStream().use { input ->
-        Json.decodeFromStream<AnalysisConfig>(input)
-    }
+fun SarifSchema210.deduplicateThreadFlowLocations(): SarifSchema210 {
+    return copy(
+        runs = runs.map { run ->
+            run.copy(
+                results = run.results?.map { result ->
+                    result.copy(
+                        codeFlows = result.codeFlows?.map { codeFlow ->
+                            codeFlow.copy(
+                                threadFlows = codeFlow.threadFlows.map { threadFlow ->
+                                    threadFlow.copy(
+                                        locations = threadFlow.locations.deduplicate()
+                                    )
+                                }
+                            )
+                        }
+                    )
+                }
+            )
+        }
+    )
+}
+
+private fun List<ThreadFlowLocation>.deduplicate(): List<ThreadFlowLocation> {
+    if (isEmpty()) return emptyList()
+
+    return listOf(first()) + zipWithNext { a, b ->
+        val aLine = a.location!!.physicalLocation!!.region!!.startLine!!
+        val bLine = b.location!!.physicalLocation!!.region!!.startLine!!
+        if (aLine != bLine) {
+            b
+        } else {
+            null
+        }
+    }.filterNotNull()
 }

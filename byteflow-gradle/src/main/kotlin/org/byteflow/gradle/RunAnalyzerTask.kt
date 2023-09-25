@@ -16,15 +16,13 @@
 
 package org.byteflow.gradle
 
-import io.github.detekt.sarif4k.SarifSchema210
-import io.github.detekt.sarif4k.ThreadFlowLocation
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToStream
 import org.byteflow.runAnalysis
 import org.gradle.api.DefaultTask
-import org.gradle.api.Project
+import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -33,8 +31,6 @@ import org.gradle.api.tasks.TaskAction
 import org.jacodb.analysis.AnalysisConfig
 import org.jacodb.analysis.graph.newApplicationGraphForAnalysis
 import org.jacodb.analysis.sarif.sarifReportFromVulnerabilities
-import org.jacodb.api.JcClassOrInterface
-import org.jacodb.api.JcClassProcessingTask
 import org.jacodb.api.JcClasspath
 import org.jacodb.api.JcMethod
 import org.jacodb.api.cfg.JcInst
@@ -42,7 +38,6 @@ import org.jacodb.impl.features.InMemoryHierarchy
 import org.jacodb.impl.features.Usages
 import org.jacodb.impl.jacodb
 import java.io.File
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
@@ -78,40 +73,43 @@ abstract class RunAnalyzerTask : DefaultTask() {
     abstract val deduplicateThreadFlowLocations: Property<Boolean>
 
     init {
+        description = "ByeFlow analyzer runner"
+        group = JavaBasePlugin.VERIFICATION_GROUP
+
+        // Task defaults:
         deduplicateThreadFlowLocations.convention(true)
     }
 
     @TaskAction
     fun analyze() {
         val timeStart = TimeSource.Monotonic.markNow()
-        logger.quiet("Start analysis at $timeStart")
+        logger.lifecycle("Start analysis at $timeStart")
 
         val config = config.get()
-        logger.quiet("config = $config")
+        logger.lifecycle("config = $config")
 
         val classpathAsFiles = classpath.get().split(File.pathSeparatorChar).sorted().map { File(it) }
-        logger.quiet("classpath = $classpathAsFiles")
+        logger.lifecycle("classpath = $classpathAsFiles")
 
-        logger.quiet("Creating db...")
+        logger.lifecycle("Creating db...")
         val timeStartCp = TimeSource.Monotonic.markNow()
         val cp = runBlocking {
             val db = jacodb {
                 dbLocation.orNull?.let {
-                    logger.quiet("Using db location: '$it'")
+                    logger.lifecycle("Using db location: '$it'")
                     persistent(it)
                 }
                 loadByteCode(classpathAsFiles)
                 installFeatures(InMemoryHierarchy, Usages)
             }
-            logger.quiet("db created")
-            logger.quiet("Creating cp...")
+            logger.lifecycle("db created")
+            logger.lifecycle("Creating cp...")
             db.classpath(classpathAsFiles)
         }
-        logger.quiet("cp created in ${timeStartCp.elapsedNow()}")
+        logger.lifecycle("cp created in ${timeStartCp.elapsedNow()}")
 
-        logger.quiet("Forming the list of methods to analyze...")
+        logger.lifecycle("Forming the list of methods to analyze...")
         val timeStartMethods = TimeSource.Monotonic.markNow()
-
         val methods = run {
             val m = methods.get().toMutableList()
             if (methodsForCp.isPresent) {
@@ -119,35 +117,35 @@ abstract class RunAnalyzerTask : DefaultTask() {
             }
             m.distinct()
         }
-        logger.quiet("Found ${methods.size} methods to analyze in ${timeStartMethods.elapsedNow()}")
+        logger.lifecycle("Found ${methods.size} methods to analyze in ${timeStartMethods.elapsedNow()}")
 
-        logger.quiet("Creating application graph...")
+        logger.lifecycle("Creating application graph...")
         val timeStartGraph = TimeSource.Monotonic.markNow()
         val graph = runBlocking {
             cp.newApplicationGraphForAnalysis()
         }
-        logger.quiet("Application graph created in ${timeStartGraph.elapsedNow()}")
+        logger.lifecycle("Application graph created in ${timeStartGraph.elapsedNow()}")
 
-        logger.quiet("Analyzing...")
+        logger.lifecycle("Analyzing...")
         val timeStartAnalysis = TimeSource.Monotonic.markNow()
         val vulnerabilities = config.analyses
             .flatMap { (analysis, options) ->
-                logger.quiet("running '$analysis' analysis...")
+                logger.info("running '$analysis' analysis...")
                 runAnalysis(analysis, options, graph, methods)
             }
-        logger.quiet("Analysis done in ${timeStartAnalysis.elapsedNow()}")
-        logger.quiet("Found ${vulnerabilities.size} vulnerabilities")
-        // for (v in vulnerabilities) {
-        //     logger.quiet("  - $v")
-        // }
+        logger.lifecycle("Analysis done in ${timeStartAnalysis.elapsedNow()}")
+        logger.lifecycle("Found ${vulnerabilities.size} vulnerabilities")
+        for (v in vulnerabilities) {
+            logger.info("  - v")
+        }
 
         val resolver = resolver.orNull ?: defaultResolver
 
-        logger.quiet("Preparing report...")
+        logger.lifecycle("Preparing report...")
         val sarif = sarifReportFromVulnerabilities(vulnerabilities) { resolver(it) }
             .let {
                 if (deduplicateThreadFlowLocations.get()) {
-                    logger.quiet("Deduplicating thread flow locations...")
+                    logger.lifecycle("Deduplicating thread flow locations...")
                     it.deduplicateThreadFlowLocations()
                 } else it
             }
@@ -156,100 +154,11 @@ abstract class RunAnalyzerTask : DefaultTask() {
             prettyPrintIndent = "  "
         }
         val output = File(outputPath.get())
-        logger.quiet("Writing SARIF to '$output'...")
+        logger.lifecycle("Writing SARIF to '$output'...")
         output.outputStream().use { stream ->
             json.encodeToStream(sarif, stream)
         }
 
-        logger.quiet("All done in %.3f s".format(timeStart.elapsedNow().toDouble(DurationUnit.SECONDS)))
+        logger.lifecycle("All done in %.1f s".format(timeStart.elapsedNow().toDouble(DurationUnit.SECONDS)))
     }
-
-    companion object {
-        const val NAME: String = "runAnalyzer"
-    }
-}
-
-fun Project.getMethodsForClasses(
-    cp: JcClasspath,
-    startClasses: List<String>,
-): List<JcMethod> {
-    logger.quiet("Searching classes...")
-    val startJcClasses = ConcurrentHashMap.newKeySet<JcClassOrInterface>()
-    runBlocking {
-        cp.execute(object : JcClassProcessingTask {
-            override fun process(clazz: JcClassOrInterface) {
-                if (startClasses.any { clazz.name.startsWith(it) }) {
-                    startJcClasses.add(clazz)
-                }
-            }
-        })
-    }
-
-    logger.quiet("startJcClasses: (${startJcClasses.size})")
-    for (clazz in startJcClasses) {
-        logger.quiet("  - $clazz")
-    }
-
-    logger.quiet("Filtering methods...")
-    val startJcMethods = startJcClasses
-        .flatMap { it.declaredMethods }
-        .filter { !it.isPrivate }
-        .distinct()
-
-    logger.quiet("startJcMethods: (${startJcMethods.size})")
-    for (method in startJcMethods) {
-        logger.quiet("  - $method")
-    }
-
-    return startJcMethods
-}
-
-val defaultResolver: (JcInst) -> String = { inst ->
-    val registeredLocation = inst.location.method.declaration.location
-    val classFileBaseName = inst.location.method.enclosingClass.name.replace('.', '/')
-    if (registeredLocation.path.contains("build/classes/")) {
-        val src = registeredLocation.path.replace("build/classes/(\\w+)/(\\w+)".toRegex()) {
-            val (language, sourceSet) = it.destructured
-            "src/${sourceSet}/${language}"
-        }
-        "file://" + File(src).resolve(classFileBaseName.substringBefore('$')).path + ".java"
-    } else {
-        File(registeredLocation.path).resolve(classFileBaseName).path + ".class"
-    }
-}
-
-fun SarifSchema210.deduplicateThreadFlowLocations(): SarifSchema210 {
-    return copy(
-        runs = runs.map { run ->
-            run.copy(
-                results = run.results?.map { result ->
-                    result.copy(
-                        codeFlows = result.codeFlows?.map { codeFlow ->
-                            codeFlow.copy(
-                                threadFlows = codeFlow.threadFlows.map { threadFlow ->
-                                    threadFlow.copy(
-                                        locations = threadFlow.locations.deduplicate()
-                                    )
-                                }
-                            )
-                        }
-                    )
-                }
-            )
-        }
-    )
-}
-
-private fun List<ThreadFlowLocation>.deduplicate(): List<ThreadFlowLocation> {
-    if (isEmpty()) return emptyList()
-
-    return listOf(first()) + zipWithNext { a, b ->
-        val aLine = a.location!!.physicalLocation!!.region!!.startLine!!
-        val bLine = b.location!!.physicalLocation!!.region!!.startLine!!
-        if (aLine != bLine) {
-            b
-        } else {
-            null
-        }
-    }.filterNotNull()
 }

@@ -26,11 +26,13 @@ import org.jacodb.analysis.AnalysisConfig
  *
  * ```
  * byteflow {
- *     // configFile = layout.projectDirectory.file("configs/config.json")
+ *     // config = analysisConfig("NPE" to mapOf("UnitResolver" to "singleton")) // (specific)
+ *     //  OR
+ *     // configFile = layout.projectDirectory.file("configs/config.json") // (default)
  *     classpath = System.getProperty("java.class.path")
  *     startClasses = listOf("org.byteflow.examples.NpeExamples")
- *     // dbLocation = "index.db"
- *     // outputFile = File("report.sarif")
+ *     // dbLocation = "index.db" // (optional)
+ *     // outputFile = File("report.sarif") // (default)
  * }
  * ```
  */
@@ -41,8 +43,4 @@ interface ByteFlowExtension {
     val startClasses: ListProperty<String>
     val dbLocation: Property<String>
     val outputPath: Property<String>
-
-    companion object {
-        const val NAME: String = "byteflow"
-    }
 }

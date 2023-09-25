@@ -5,16 +5,20 @@ plugins {
     // id(Plugins.Shadow.id)
 }
 
+// tasks.shadowJar {
+//     archiveClassifier = ""
+// }
+
 dependencies {
-    implementation(project(":core"))
+    api(project(":core"))
 
     implementation(Libs.kotlinx_coroutines_core)
     implementation(Libs.kotlinx_serialization_json)
     implementation(Libs.sarif4k)
 }
 
-group = "com.github.UnitTestBot.byteflow"
-version = "0.1.0-SNAPSHOT"
+// group = "com.github.UnitTestBot.byteflow"
+// version = "0.1.0-SNAPSHOT"
 
 gradlePlugin {
     website = "https://github.com/UnitTestBot/byteflow"
@@ -34,15 +38,5 @@ publishing {
         maven {
             url = uri(layout.buildDirectory.dir("repository"))
         }
-    }
-}
-
-// tasks.shadowJar {
-//     archiveClassifier = ""
-// }
-
-tasks.register("stuff") {
-    doLast {
-        println("project '${project.name}' has group = '${project.group}'")
     }
 }

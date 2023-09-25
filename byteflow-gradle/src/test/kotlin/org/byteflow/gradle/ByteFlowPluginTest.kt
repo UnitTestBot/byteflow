@@ -30,16 +30,14 @@ class ByteFlowPluginTest {
     @Test
     fun `plugin should register runAnalyzer task`() {
         val project = buildProject()
-        val plugin = project.byteflowPlugin
-        val task = project.tasks.getByName(RunAnalyzerTask.NAME)
+        val task = project.tasks.getByName(ByteFlowPlugin.TASK_NAME)
         assertNotNull(task)
     }
 
     @Test
     fun `plugin should register byteflow extension`() {
         val project = buildProject()
-        val plugin = project.byteflowPlugin
-        val extension = project.extensions.getByName(ByteFlowExtension.NAME)
+        val extension = project.extensions.getByName(ByteFlowPlugin.EXTENSION_NAME)
         assertNotNull(extension)
     }
 }
