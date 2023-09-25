@@ -18,14 +18,7 @@ public class SqlInjectionSampleTP {
             adminUserName = getAdminUserNameDev();
         }
 
-        boolean isAdmin;
-        if (isProduction) {
-            isAdmin = checkUserIsAdminProd(userId, adminUserName);
-        } else {
-            isAdmin = checkUserIsAdminProd(userId, adminUserName);
-        }
-
-        return isAdmin;
+        return checkUserIsAdmin(userId, adminUserName);
     }
 
     private String getAdminUserNameProd() {
@@ -36,11 +29,10 @@ public class SqlInjectionSampleTP {
         return System.getenv("admin_name");
     }
 
-    private boolean checkUserIsAdminProd(String userId, String adminName) throws SQLException {
+    private boolean checkUserIsAdmin(String userId, String adminName) throws SQLException {
         String adminId;
         try (Connection dbConnection = DriverManager.getConnection("url://127.0.0.1:8080");
              Statement statement = dbConnection.createStatement()) {
-            // SECS: potential SQL injection
             ResultSet rs = statement.executeQuery("SELECT id from users where name='" + adminName + "'");
             if (rs.next()) {
                 adminId = rs.getString(0);
@@ -55,22 +47,4 @@ public class SqlInjectionSampleTP {
 
         return adminId.equals(userId);
     }
-
-    private boolean checkUserIsAdminDev(String userId, String adminName) {
-        String adminId;
-        switch (adminName) {
-            case "root_1":
-                adminId = "1";
-                break;
-            case "root_2":
-                adminId = "2";
-                break;
-            default:
-                adminId = "0";
-                break;
-        }
-
-        return adminId.equals(userId);
-    }
-
 }
