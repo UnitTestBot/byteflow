@@ -19,16 +19,13 @@ package org.byteflow
 import kotlinx.coroutines.runBlocking
 import org.byteflow.examples.NpeExamples
 import org.jacodb.analysis.graph.newApplicationGraphForAnalysis
-import org.jacodb.api.JcClassOrInterface
-import org.jacodb.api.JcClassProcessingTask
 import org.jacodb.impl.features.InMemoryHierarchy
 import org.jacodb.impl.features.Usages
 import org.jacodb.impl.jacodb
 import java.io.File
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.test.Test
 
-class AnalysisTest {
+class NpeExamplesTest {
     @Test
     fun `test NPE analysis of NpeExamples`() {
         val classpath = System.getProperty("java.class.path")
@@ -43,35 +40,12 @@ class AnalysisTest {
             db.classpath(classpathAsFiles)
         }
 
-        val startClasses = listOf(NpeExamples::class.java.name)
-        val startJcClasses = ConcurrentHashMap.newKeySet<JcClassOrInterface>()
-        runBlocking {
-            cp.execute(object : JcClassProcessingTask {
-                override fun process(clazz: JcClassOrInterface) {
-                    if (startClasses.contains(clazz.name)) {
-                        startJcClasses.add(clazz)
-                    }
-                }
-            })
-        }
-        println("startJcClasses: (${startJcClasses.size})")
-        for (clazz in startJcClasses) {
-            println("  - $clazz")
-        }
-
-        val startJcMethods = startJcClasses
-            .flatMap { it.declaredMethods }
-            .filter { !it.isPrivate }
-            .distinct()
-        println("startJcMethods: (${startJcMethods.size})")
-        for (method in startJcMethods) {
-            println("  - $method")
-        }
+        val methods = getPublicMethodsForClasses(cp, listOf(NpeExamples::class.java.name))
 
         val graph = runBlocking {
             cp.newApplicationGraphForAnalysis()
         }
 
-        runAnalysis("NPE", mapOf("UnitResolver" to "singleton"), graph, startJcMethods)
+        runAnalysis("NPE", mapOf("UnitResolver" to "singleton"), graph, methods)
     }
 }
