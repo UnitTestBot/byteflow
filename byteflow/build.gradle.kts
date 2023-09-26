@@ -43,6 +43,7 @@ subprojects {
     }
 }
 
+// Kotlin DSL requires some repository declared in the root project
 repositories {
     mavenCentral()
 }
