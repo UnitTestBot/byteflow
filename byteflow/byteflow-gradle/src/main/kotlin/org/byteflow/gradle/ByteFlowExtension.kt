@@ -32,7 +32,7 @@ import org.jacodb.analysis.AnalysisConfig
  *     classpath = System.getProperty("java.class.path")
  *     startClasses = listOf("org.byteflow.examples.NpeExamples")
  *     // dbLocation = "index.db" // (optional)
- *     // outputFile = File("report.sarif") // (default)
+ *     // outputPath = "report.sarif" // (default)
  * }
  * ```
  */
