@@ -41,10 +41,6 @@ byteflow {
     dbLocation = "index.db"
 }
 
-tasks.runAnalyzer {
-    dependsOn(tasks.compileJava)
-}
-
 // ------------------------------------------------------------------------------------------------
 // Specific analysis tasks.
 //

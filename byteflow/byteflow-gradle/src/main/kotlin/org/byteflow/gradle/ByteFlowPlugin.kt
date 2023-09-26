@@ -20,7 +20,10 @@ import org.byteflow.analysisConfigFromFile
 import org.byteflow.getPublicMethodsForClasses
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 
 class ByteFlowPlugin : Plugin<Project> {
@@ -46,6 +49,13 @@ class ByteFlowPlugin : Plugin<Project> {
         // 'runAnalyzer' task
         project.tasks.register<RunAnalyzerTask>(TASK_NAME) {
             logger.lifecycle("Registering '$name' task")
+
+            // Automatically depend on `compileJava` task, if the project has `java` plugin applied:
+            dependsOn(
+                project.allprojects
+                    .filter { it.plugins.hasPlugin(JavaPlugin::class.java) }
+                    .map { it.tasks.named<JavaCompile>(JavaPlugin.COMPILE_JAVA_TASK_NAME) }
+            )
 
             // Note: task defaults are configured in the task's `init {...}` block.
 
