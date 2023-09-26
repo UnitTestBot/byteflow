@@ -21,7 +21,8 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       - name: Build and run tests
-        run: ./gradlew -p byteflow build --stacktrace --scan
+        working-directory: byteflow
+        run: ../gradlew build --stacktrace --scan
 
       - name: Publish test results
         uses: EnricoMi/publish-unit-test-result-action@v2
