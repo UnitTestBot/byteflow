@@ -76,7 +76,8 @@ abstract class RunAnalyzerTask : DefaultTask() {
         group = JavaBasePlugin.VERIFICATION_GROUP
 
         // Task defaults:
-        sourceResolver.convention(defaultSourceFileResolver)
+        sourceResolver.convention { defaultSourceFileResolver(it) }
+        // sourceResolver.convention(defaultSourceFileResolver) // doesn't work!
         deduplicateThreadFlowLocations.convention(true)
     }
 
