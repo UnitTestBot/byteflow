@@ -73,7 +73,7 @@ abstract class RunAnalyzerTask : DefaultTask() {
     abstract val deduplicateThreadFlowLocations: Property<Boolean>
 
     init {
-        description = "ByeFlow analyzer runner"
+        description = "ByteFlow analyzer runner"
         group = JavaBasePlugin.VERIFICATION_GROUP
 
         // Task defaults:
