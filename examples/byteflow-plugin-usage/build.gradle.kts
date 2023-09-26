@@ -5,7 +5,6 @@ import org.byteflow.gradle.RunAnalyzerTask
 plugins {
     `java-library`
     id("io.github.UnitTestBot.byteflow") version "0.1.0-SNAPSHOT"
-    // id("byteflow-gradle") version "..."
 }
 
 buildscript {
