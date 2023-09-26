@@ -41,6 +41,12 @@ subprojects {
             jvmTarget = "1.8"
         }
     }
+
+    tasks.register("hello") {
+        doLast {
+            println("Hello from ${this.project.name}!")
+        }
+    }
 }
 
 // Kotlin DSL requires some repository declared in the root project
