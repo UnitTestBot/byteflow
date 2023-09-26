@@ -96,8 +96,9 @@ abstract class RunAnalyzerTask : DefaultTask() {
         val cp = runBlocking {
             val db = jacodb {
                 dbLocation.orNull?.let {
-                    logger.lifecycle("Using db location: '$it'")
-                    persistent(it)
+                    val f = project.file(it)
+                    logger.lifecycle("Using db location: '$f'")
+                    persistent(f.path)
                 }
                 loadByteCode(classpathAsFiles)
                 installFeatures(InMemoryHierarchy, Usages)
@@ -153,7 +154,7 @@ abstract class RunAnalyzerTask : DefaultTask() {
             prettyPrint = true
             prettyPrintIndent = "  "
         }
-        val output = File(outputPath.get())
+        val output = project.file(outputPath)
         logger.lifecycle("Writing SARIF to '$output'...")
         output.outputStream().use { stream ->
             json.encodeToStream(sarif, stream)
