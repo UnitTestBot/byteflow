@@ -21,14 +21,11 @@ jobs:
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v2
 
-      - name: Publish to local Maven repository
-        run: ./gradlew :core:publishToMavenLocal :gradle:publish --stacktrace --scan
-
       # NpeExamples
 
       - name: Run analysis on sample project
         working-directory: examples/byteflow-plugin-usage
-        run: ./gradlew runAnalyzer
+        run: ../../gradlew runAnalyzer
 
       - name: Upload SARIF report as artifact
         uses: actions/upload-artifact@v3
@@ -46,7 +43,7 @@ jobs:
 
       - name: Run analysis on sample project (Juliet CWE476)
         working-directory: examples/byteflow-juliet
-        run: ./gradlew analyzeJulietCwe476
+        run: ../../gradlew analyzeJulietCwe476
 
       - name: Upload SARIF report as artifact (Juliet CWE476)
         uses: actions/upload-artifact@v3
@@ -64,7 +61,7 @@ jobs:
 
       - name: Run analysis on sample project (Juliet CWE690)
         working-directory: examples/byteflow-juliet
-        run: ./gradlew analyzeJulietCwe690
+        run: ../../gradlew analyzeJulietCwe690
 
       - name: Upload SARIF report as artifact (Juliet CWE690)
         uses: actions/upload-artifact@v3
@@ -82,7 +79,7 @@ jobs:
 
       - name: Run analysis on sample project (Juliet CWE563)
         working-directory: examples/byteflow-juliet
-        run: ./gradlew analyzeJulietCwe563
+        run: ../../gradlew analyzeJulietCwe563
 
       - name: Upload SARIF report as artifact (Juliet CWE563)
         uses: actions/upload-artifact@v3
@@ -100,7 +97,7 @@ jobs:
 
       - name: Run analysis on sample project (Juliet CWE89)
         working-directory: examples/byteflow-juliet
-        run: ./gradlew analyzeJulietCwe89
+        run: ../../gradlew analyzeJulietCwe89
 
       - name: Upload SARIF report as artifact (Juliet CWE89)
         uses: actions/upload-artifact@v3

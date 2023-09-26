@@ -23,7 +23,7 @@ jobs:
 
       - name: Run analysis on sample project
         working-directory: examples/byteflow-plugin-usage
-        run: ./gradlew runAnalyzer -PuseUsvmAnalysis=true
+        run: ../../gradlew runAnalyzer -PuseUsvmAnalysis=true
 
       - name: Upload SARIF report
         uses: github/codeql-action/upload-sarif@v2
