@@ -114,7 +114,7 @@ fun julietMethods(classes: () -> List<JcClassOrInterface>): List<JcMethod> {
     return startMethods
 }
 
-fun julietResolver(cweNum: Int): (JcInst) -> String = { inst ->
+fun julietSourceResolver(cweNum: Int): (JcInst) -> String = { inst ->
     val registeredLocation = inst.location.method.declaration.location
     val classFileBaseName = inst.location.method.enclosingClass.name.replace('.', '/')
     if (registeredLocation.path.contains("build/classes/java/main")) {
@@ -156,7 +156,7 @@ tasks.register<RunAnalyzerTask>("analyzeJulietCwe476") {
         }
     }
     outputPath = "report-cwe476.sarif"
-    resolver = julietResolver(476)
+    sourceResolver = julietSourceResolver(476)
 }
 
 
@@ -186,7 +186,7 @@ tasks.register<RunAnalyzerTask>("analyzeJulietCwe690") {
         }
     }
     outputPath = "report-cwe690.sarif"
-    resolver = julietResolver(690)
+    sourceResolver = julietSourceResolver(690)
 }
 
 
@@ -231,7 +231,7 @@ tasks.register<RunAnalyzerTask>("analyzeJulietCwe563") {
         }
     }
     outputPath = "report-cwe563.sarif"
-    resolver = julietResolver(563)
+    sourceResolver = julietSourceResolver(563)
 }
 
 tasks.register<RunAnalyzerTask>("analyzeJulietCwe89") {
@@ -263,7 +263,7 @@ tasks.register<RunAnalyzerTask>("analyzeJulietCwe89") {
         }
     }
     outputPath = "report-cwe89.sarif"
-    resolver = julietResolver(89)
+    sourceResolver = julietSourceResolver(89)
 }
 
 tasks.wrapper {

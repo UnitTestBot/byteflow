@@ -21,7 +21,7 @@ import io.github.detekt.sarif4k.ThreadFlowLocation
 import org.jacodb.api.cfg.JcInst
 import java.io.File
 
-val defaultResolver: (JcInst) -> String = { inst ->
+val defaultSourceFileResolver: (JcInst) -> String = { inst ->
     val registeredLocation = inst.location.method.declaration.location
     val classFileBaseName = inst.location.method.enclosingClass.name.replace('.', '/')
     if (registeredLocation.path.contains("build/classes/")) {

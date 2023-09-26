@@ -65,9 +65,8 @@ abstract class RunAnalyzerTask : DefaultTask() {
     @get:Input
     abstract val outputPath: Property<String>
 
-    @get:Optional
     @get:Input
-    abstract val resolver: Property<(JcInst) -> String>
+    abstract val sourceResolver: Property<(JcInst) -> String>
 
     @get:Input
     abstract val deduplicateThreadFlowLocations: Property<Boolean>
@@ -77,6 +76,7 @@ abstract class RunAnalyzerTask : DefaultTask() {
         group = JavaBasePlugin.VERIFICATION_GROUP
 
         // Task defaults:
+        sourceResolver.convention(defaultSourceFileResolver)
         deduplicateThreadFlowLocations.convention(true)
     }
 
@@ -140,10 +140,8 @@ abstract class RunAnalyzerTask : DefaultTask() {
             logger.info("  - v")
         }
 
-        val resolver = resolver.orNull ?: defaultResolver
-
         logger.lifecycle("Preparing report...")
-        val sarif = sarifReportFromVulnerabilities(vulnerabilities) { resolver(it) }
+        val sarif = sarifReportFromVulnerabilities(vulnerabilities, sourceFileResolver = sourceResolver.get())
             .let {
                 if (deduplicateThreadFlowLocations.get()) {
                     logger.lifecycle("Deduplicating thread flow locations...")
